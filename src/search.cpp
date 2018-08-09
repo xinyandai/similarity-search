@@ -5,7 +5,8 @@
 
 #include "include/common/parameters.hpp"
 #include "include/common/index.hpp"
-#include "include/common/query.hpp"
+#include "include/common/index/srp.hpp"
+#include "include/common/query/hrquery.hpp"
 
 #include "include/lshbox/eval.h"
 #include "include/lshbox/bench/bencher.h"
@@ -73,7 +74,7 @@ int main(int argc, char** argv) {
 	para.base_size  = base_data.getSize();
 	para.query_size = query_data.getSize();
 
-	Index<DataType > * index = new Index<DataType >(para);
+	BitIndex<DataType > * index = new ss::SRPIndex<DataType >(para);
 
 	index->preprocess_train(train_data);
 	index->preprocess_base(base_data);
@@ -84,9 +85,9 @@ int main(int argc, char** argv) {
 	lshbox::Metric<DataType > metric(para.dim, L2_DIST);	
 	typename lshbox::Matrix<DataType >::Accessor accessor(base_data);
 
-	vector<Query<DataType>* > queries;
+	vector<HRQuery<DataType>* > queries;
 	for (int i = 0; i < para.query_size; i++) {
-		queries.push_back(new Query<DataType>(index, query_data, metric, accessor, para ) );
+		queries.push_back(new HRQuery<DataType >(index, query_data[i], metric, accessor, para ) );
 	}
 
 	cout 

@@ -13,15 +13,24 @@ namespace ss {
 	template <class DataType>
 	class Query  {
 		using AccessorType = typename lshbox::Matrix<DataType>::Accessor;
+	
 	private:
 		Index<DataType >*		_index;
-		lshbox::Matrix<DataType>&	_query;
+		DataType*			_query;
 		lshbox::Scanner<AccessorType >	_scanner;
 		parameter& 			_para;
 
 	public:
-		Query(Index<DataType >* index, lshbox::Matrix<DataType>& query, lshbox::Metric<DataType > metric, const AccessorType& accessor, parameter& para) 
-			: _index(index), _query(query), _scanner(accessor, metric, para.topK), _para(para) {}
+		Query(Index<DataType >* index, 
+				DataType*  query, 
+				lshbox::Metric<DataType >& metric, 
+				const AccessorType& accessor, 
+				parameter& para) 
+			:
+			_index(index), 
+			_query(query), 
+			_scanner(accessor, metric, para.topK), 
+			_para(para) {}
 
 		virtual ~Query() {}
 			
@@ -33,8 +42,16 @@ namespace ss {
 
 		virtual bool 	nextBucketExisted() { return getNumItemsProbed() < _para.base_size; }
 
-		virtual void 	probeNextBucket() { /**for each item _scanner(item);**/ }
+		virtual void 	probeNextBucket() {
+
+			vector<int>& bucket = nextBucket();
+			for(int i=0; i<bucket.size(); i++)
+				_scanner(bucket[i]);
 		
+		}
+		
+		virtual vector<int>& nextBucket() = 0;
+
 		inline 	int 	getNumItemsProbed() const { return _scanner.cnt(); }
 	
 		inline 	const 	vector<pair<float, unsigned>>& getSortedTopK() { return  _scanner.getMutableTopk().genTopk(); }

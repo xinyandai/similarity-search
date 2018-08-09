@@ -8,9 +8,11 @@ namespace ss {
 
 	template <class DataType>
 	class Index {
-		parameter& para_;
+	
+	protected:
+		parameter& _para;
 	public:
-		Index(parameter& para): para_(para) {}
+		Index(parameter& para): _para(para) {}
 
 		virtual void preprocess_train(lshbox::Matrix<DataType > ) {}
 		virtual void preprocess_base (lshbox::Matrix<DataType > ) {}
