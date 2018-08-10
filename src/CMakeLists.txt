@@ -4,7 +4,7 @@ project(SimilaritySearch)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-find_package(Boost 1.58.0 COMPONENTS system filesystem regex thread program_options date_time chrono)
+find_package(Boost COMPONENTS system filesystem regex thread program_options date_time chrono)
 if(NOT Boost_FOUND)
 	message("NOT FOUND BOOST")
 endif()

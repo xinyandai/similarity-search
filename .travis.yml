@@ -12,9 +12,12 @@ addons:
       - gcc-6
       - g++-6
       - cmake
+before_script:
+  - sudo apt-get install libboost-all-dev
 script:
   # Check versions of gcc, g++ and cmake
   - gcc -v && g++ -v && cmake --version
+  - dpkg -S /usr/include/boost/version.hpp
   # Run your build commands next\
   - mkdir release
   - cd release
