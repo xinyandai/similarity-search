@@ -14,8 +14,10 @@ namespace ss {
 	public:	
 		SRPIndex(parameter& para) : BitIndex<DataType >(para) {}
 
-		virtual void train(lshbox::Matrix<DataType >) {
-			
+		virtual void train(lshbox::Matrix<DataType > & data) {
+
+			this->initilize_means(data);
+
 			std::default_random_engine generator;
 			std::normal_distribution<DataType > distribution(0.0, 1.0);
 			
@@ -26,7 +28,6 @@ namespace ss {
 			}
 		} 
 
-		virtual ~SRPIndex() {}
 	};
 	
 }

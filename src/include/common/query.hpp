@@ -30,7 +30,10 @@ namespace ss {
 			_index(index), 
 			_query(query), 
 			_scanner(accessor, metric, para.topK), 
-			_para(para) {}
+			_para(para) {
+			
+			_scanner.reset(query);
+		}
 
 		virtual ~Query() {}
 			
@@ -45,6 +48,8 @@ namespace ss {
 		virtual void 	probeNextBucket() {
 
 			vector<int>& bucket = nextBucket();
+			assert(bucket.size() > 0);
+
 			for(int i=0; i<bucket.size(); i++)
 				_scanner(bucket[i]);
 		
