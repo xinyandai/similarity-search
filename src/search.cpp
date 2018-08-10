@@ -21,32 +21,34 @@ using namespace lshbox;
 namespace po = boost::program_options;
 
 template <class DataType, class IndexType, class Querytype>
-int execuate(int argc, char** argv);
+int execuate(parameter& para);
+
+void load_options(int argc, char** argv, parameter & para);
+
 
 int main(int argc, char** argv) {
 	using DataType = float;
-	execuate<DataType, SRPIndex<DataType >, HRQuery<DataType> >(argc, argv);	
+	parameter para;
+	load_options(argc, argv, para);
+	execuate<DataType, SRPIndex<DataType >, HRQuery<DataType > >(para);	
 }
 
-template <class DataType, class IndexType, class QueryType>
-int execuate(int argc, char** argv) {
-	
 
-	ss::parameter para;
+void load_options(int argc, char** argv, parameter& para) {
 
 	po::options_description opts("Allowed options");
 	opts.add_options()
 		("help,h", "help info")
 
-		("num_bit,nb", 	   po::value<int >(&para.num_bit)->default_value(32)  , "num of hash bit")
+		("num_bit,l", 	   po::value<int >(&para.num_bit)->default_value(32)  , "num of hash bit")
 		("topK,k", 	   po::value<int >(&para.topK)->default_value(20)     , "size of result set")
-		("num_thread,nt",  po::value<int >(&para.num_thread)->default_value(1), "num thread")
+		("num_thread",  po::value<int >(&para.num_thread)->default_value(1), "num thread")
 		("dim,d", 	   po::value<int >(&para.dim)->default_value(-1)      , "origin dimension of data")
 		
-		("train_data,td",  po::value<string >(&para.train_data),   "data for training")
-		("base_data,bd",   po::value<string >(&para.base_data) ,   "data saved in index")
-		("query_data,qd",  po::value<string >(&para.query_data),   "data for query")
-		("ground_truth,gt",po::value<string >(&para.ground_truth), "data for query")
+		("train_data,t",  po::value<string >(&para.train_data),   "data for training")
+		("base_data,b",   po::value<string >(&para.base_data) ,   "data saved in index")
+		("query_data,q",  po::value<string >(&para.query_data),   "data for query")
+		("ground_truth,g",po::value<string >(&para.ground_truth), "ground truth")
 	;
 
 	po::variables_map vm;
@@ -55,8 +57,12 @@ int execuate(int argc, char** argv) {
 
 	if(vm.count("help")) {
 		cout << opts << endl; 
-		return 0;
+		exit(0);
 	}
+}
+
+template <class DataType, class IndexType, class QueryType>
+int execuate(parameter& para) {
 
 	Bencher truthBencher(para.ground_truth.c_str());	
 
@@ -68,16 +74,9 @@ int execuate(int argc, char** argv) {
 	para.base_size  = base_data.getSize();
 	para.query_size = query_data.getSize();
 	para.dim = train_data.getDim();
-	
-	cout 
-		<< "train_data dimension: \t" << train_data.getDim() << "\t size:" << train_data.getSize() << endl 
-		<< "base_data dimension : \t" << base_data.getDim()  << "\t size:" << base_data.getSize()  << endl 
-		<< "query_data dimension: \t" << query_data.getDim() << "\t size:" << query_data.getSize() << endl 
-		<< endl;
 
 	IndexType * index = new IndexType(para);
 
-	cout << "build index and preprocess data" << endl;
 
 	index->preprocess_train(train_data);
 	index->preprocess_base(base_data);
