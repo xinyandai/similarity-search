@@ -2,10 +2,8 @@
 
 #include "../parameters.hpp"
 #include "../query.hpp"
-#include "../calculator.hpp"
 #include "../bitindex.hpp"
 
-#include "../../lshbox/topk.h"
 
 namespace ss {
 

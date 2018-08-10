@@ -3,17 +3,16 @@
 
 #include <boost/program_options.hpp>
 
-#include "include/common/parameters.hpp"
-#include "include/common/index.hpp"
-#include "include/common/index/srp.hpp"
-#include "include/common/query/hrquery.hpp"
+#include "include/parameters.hpp"
+#include "include/index.hpp"
+#include "include/index/srp.hpp"
+#include "include/query/hrquery.hpp"
 
-#include "include/lshbox/eval.h"
-#include "include/lshbox/bench/bencher.h"
-#include "include/lshbox/bench/benchrecord.h"
+#include "include/bench/bencher.h"
+#include "include/bench/benchrecord.h"
 
-#include "include/lshbox/matrix.h"
-#include "include/common/basis.h"
+#include "include/matrix.h"
+#include "include/utils/util.hpp"
 
 using namespace std;
 using namespace ss;

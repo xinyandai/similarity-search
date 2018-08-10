@@ -3,7 +3,8 @@
 #include <unordered_map>
 #include <vector>
 #include "index.hpp"
-#include "calculator.hpp"
+#include "utils/calculator.hpp"
+#include "matrix.h"
 
 namespace ss {
 

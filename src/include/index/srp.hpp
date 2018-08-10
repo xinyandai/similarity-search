@@ -3,7 +3,6 @@
 #include <unordered_map>
 #include <vector>
 #include <random>
-#include "../index.hpp"
 #include "../bitindex.hpp"
 namespace ss {
 

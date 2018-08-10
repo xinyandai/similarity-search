@@ -2,9 +2,10 @@
 
 #include "parameters.hpp"
 #include "index.hpp"
+#include "metric.h"
 
-#include "../lshbox/topk.h"
-#include "../lshbox/metric.h"
+#include "utils/topk.h"
+#include "utils/calculator.hpp"
 
 namespace ss {
 

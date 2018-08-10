@@ -1,7 +1,9 @@
 #pragma once
 
-#include "../lshbox/matrix.h"
+#include "matrix.h"
 #include "parameters.hpp"
+
+#include "utils/calculator.hpp"
 
 namespace ss {
 
