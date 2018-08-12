@@ -18,7 +18,6 @@ using namespace std;
 using namespace ss;
 using namespace lshbox;
 
-namespace po = boost::program_options;
 
 template <class DataType, class IndexType, class Querytype>
 int execuate(parameter& para);
@@ -35,25 +34,30 @@ int main(int argc, char** argv) {
 
 
 void load_options(int argc, char** argv, parameter& para) {
+	
+	namespace po = boost::program_options;
 
 	po::options_description opts("Allowed options");
 	opts.add_options()
 		("help,h", "help info")
 
-		("num_bit,l", 	   po::value<int >(&para.num_bit)->default_value(32)  , "num of hash bit")
-		("topK,k", 	   po::value<int >(&para.topK)->default_value(20)     , "size of result set")
-		("num_thread",  po::value<int >(&para.num_thread)->default_value(1), "num thread")
-		("dim,d", 	   po::value<int >(&para.dim)->default_value(-1)      , "origin dimension of data")
+		("num_bit,l",		po::value<int >(&para.num_bit)->default_value(32)  , "num of hash bit")
+		("topK,k",		po::value<int >(&para.topK)->default_value(20)     , "size of result set")
+		("num_thread",		po::value<int >(&para.num_thread)->default_value(1), "num thread")
+		("dim,d", 		po::value<int >(&para.dim)->default_value(-1)      , "origin dimension of data")
+		("transformed_dim",	po::value<int >(&para.transformed_dim)->default_value(0)      , "origin dimension of data")
 		
-		("train_data,t",  po::value<string >(&para.train_data),   "data for training")
-		("base_data,b",   po::value<string >(&para.base_data) ,   "data saved in index")
-		("query_data,q",  po::value<string >(&para.query_data),   "data for query")
-		("ground_truth,g",po::value<string >(&para.ground_truth), "ground truth")
+		("train_data,t",  	po::value<string >(&para.train_data),   "data for training")
+		("base_data,b",		po::value<string >(&para.base_data) ,   "data saved in index")
+		("query_data,q",	po::value<string >(&para.query_data),   "data for query")
+		("ground_truth,g",	po::value<string >(&para.ground_truth), "ground truth")
 	;
 
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, opts), vm);
 	po::notify(vm);
+
+	para.map = vm;
 
 	if(vm.count("help")) {
 		cout << opts << endl; 
@@ -66,9 +70,9 @@ int execuate(parameter& para) {
 
 	Bencher truthBencher(para.ground_truth.c_str());	
 
-	lshbox::Matrix<DataType> train_data(para.train_data);
-	lshbox::Matrix<DataType> base_data(para.base_data);
-	lshbox::Matrix<DataType> query_data(para.query_data);
+	lshbox::Matrix<DataType> train_data(para.train_data, para.transformed_dim);
+	lshbox::Matrix<DataType> base_data (para.base_data,  para.transformed_dim);
+	lshbox::Matrix<DataType> query_data(para.query_data, para.transformed_dim);
 	
 	para.train_size = train_data.getSize();
 	para.base_size  = base_data.getSize();
@@ -76,7 +80,6 @@ int execuate(parameter& para) {
 	para.dim = train_data.getDim();
 
 	IndexType * index = new IndexType(para);
-
 
 	index->preprocess_train(train_data);
 	index->preprocess_base(base_data);
@@ -91,7 +94,6 @@ int execuate(parameter& para) {
 	for (int i = 0; i < para.query_size; i++) {
 		queries.push_back(new QueryType(index, query_data[i], metric, accessor, para ) );
 	}
-
 
 	const char * spliter = ", ";
 	cout

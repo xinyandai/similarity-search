@@ -1,5 +1,5 @@
 #pragma once
-#define HUGE_MATRIX
+// #define HUGE_MATRIX
 #if defined(HUGE_MATRIX)  
 #include "matrix/hugematrix.h"
 #else  

@@ -33,6 +33,8 @@
 #include <string.h>
 #include <cmath>
 #include <iostream>
+#include <cstring>
+
 namespace lshbox
 {
 /**
@@ -64,6 +66,7 @@ public:
             delete [] dims;
         }
         dims = new T[dim * N];
+	std::memset(dims, 0, sizeof(T)*dim*N);
     }
     Matrix(): dim(0), N(0), dims(NULL) {}
     Matrix(int _dim, int _N): dims(NULL)
@@ -105,29 +108,12 @@ public:
     {
         return N;
     }
-    /**
-     * Load the Matrix from a binary file.
-     */
-    void load(const std::string &path)
+    Matrix(const std::string &path, int transformed_dim): dims(NULL)
     {
-        loadFvecs((*this), path);
+        loadFvecs((*this), path, transformed_dim);
     }
-    Matrix(const std::string &path): dims(NULL)
-    {
-        load(path);
-    }
-    Matrix(const Matrix& M): dims(NULL)
-    {
-        reset(M.getDim(), M.getSize());
-        memcpy(dims, M.getData(), sizeof(T) * dim * N);
-    }
-    Matrix& operator = (const Matrix& M)
-    {
-        dims = NULL;
-        reset(M.getDim(), M.getSize());
-        memcpy(dims, M.getData(), sizeof(T) * dim * N);
-        return *this;
-    }
+    Matrix(const Matrix& M) = delete;
+    Matrix& operator=(const Matrix& M)  = delete;
 
     std::vector<float> calNorms() {
         std::vector<float> results(this->getSize());
@@ -179,7 +165,7 @@ public:
     };
 
     template<typename DATATYPE>
-    friend void loadFvecs(Matrix<DATATYPE>& data, const std::string& dataFile) {
+    friend void loadFvecs(Matrix<DATATYPE>& data, const std::string& dataFile, int transformed_dim) {
         std::ifstream fin(dataFile.c_str(), std::ios::binary | std::ios::ate);
         if (!fin) {
             std::cout << "cannot open file " << dataFile.c_str() << std::endl;
@@ -195,7 +181,7 @@ public:
         assert(fileSize % bytesPerRecord == 0);
         long cardinality = fileSize / bytesPerRecord;
 
-        data.reset(dimension, cardinality);
+        data.reset(dimension+transformed_dim, cardinality);
         fin.read((char *)(data[0]), sizeof(float) * dimension);
 
         int dim;
