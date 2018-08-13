@@ -20,26 +20,32 @@ using std::string;
 using std::istringstream;
 
 class Bencher {
+private:
+    vector<BenchRecord> nns;
+    int topK;
+    int queries;
 public:
+    int getTopK()	const { return topK; }
+    int getQueries()	const { return queries; }
+
     Bencher (const char* benchFile) {
         ifstream fin(benchFile);
         if (!benchFile) {
             cout << "cannot open benchFile: " << benchFile << endl;
             assert(false);
         }
-        int numQueries;
-        float threshold; 
 
         string line;
         getline(fin, line);
         istringstream issFirstLine(line);
-        issFirstLine >> numQueries >> threshold;
+        issFirstLine >>queries >> topK;
+	
 
-        nns.reserve(numQueries);
+        nns.reserve(queries);
         unsigned qid;
         unsigned itemId;
         float itemDist;
-        for (int i = 0; i < numQueries; ++i) {
+        for (int i = 0; i < queries; ++i) {
             getline(fin, line);
             istringstream iss(line);
             iss >> qid;
@@ -122,6 +128,4 @@ public:
     const BenchRecord& getRecord(unsigned qId) const {
         return this->nns[qId];
     }
-private:
-    vector<BenchRecord> nns;
 };

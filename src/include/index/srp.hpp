@@ -13,7 +13,7 @@ namespace ss {
 	public:	
 		SRPIndex(parameter& para) : BitIndex<DataType >(para) {}
 
-		virtual void train(lshbox::Matrix<DataType > & data) {
+		virtual void train(const lshbox::Matrix<DataType > & data) {
 
 			this->initilize_means(data);
 

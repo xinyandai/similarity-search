@@ -66,7 +66,6 @@ public:
             delete [] dims;
         }
         dims = new T[dim * N];
-	std::memset(dims, 0, sizeof(T)*dim*N);
     }
     Matrix(): dim(0), N(0), dims(NULL) {}
     Matrix(int _dim, int _N): dims(NULL)
@@ -108,14 +107,14 @@ public:
     {
         return N;
     }
-    Matrix(const std::string &path, int transformed_dim): dims(NULL)
+    Matrix(const std::string &path): dims(NULL)
     {
-        loadFvecs((*this), path, transformed_dim);
+        loadFvecs((*this), path);
     }
     Matrix(const Matrix& M) = delete;
     Matrix& operator=(const Matrix& M)  = delete;
 
-    std::vector<float> calNorms() {
+    std::vector<float> calNorms() const {
         std::vector<float> results(this->getSize());
         float norm;
         for (int i = 0; i < results.size(); ++i) {
@@ -165,7 +164,7 @@ public:
     };
 
     template<typename DATATYPE>
-    friend void loadFvecs(Matrix<DATATYPE>& data, const std::string& dataFile, int transformed_dim) {
+    friend void loadFvecs(Matrix<DATATYPE>& data, const std::string& dataFile) {
         std::ifstream fin(dataFile.c_str(), std::ios::binary | std::ios::ate);
         if (!fin) {
             std::cout << "cannot open file " << dataFile.c_str() << std::endl;
@@ -181,7 +180,7 @@ public:
         assert(fileSize % bytesPerRecord == 0);
         long cardinality = fileSize / bytesPerRecord;
 
-        data.reset(dimension+transformed_dim, cardinality);
+        data.reset(dimension, cardinality);
         fin.read((char *)(data[0]), sizeof(float) * dimension);
 
         int dim;

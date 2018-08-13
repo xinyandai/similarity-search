@@ -18,12 +18,16 @@ struct parameter {
 	int transformed_dim;
 
 	int num_bit;
+	int num_sub_data_set;
 
 	int train_size;
 	int query_size;
 	int base_size;
 	
 	boost::program_options::variables_map map;
+
+	template<class VaribleType>
+	VaribleType get(const char * key) {	return map[key].as<VaribleType>(); }
 
 } typedef parameter;
 

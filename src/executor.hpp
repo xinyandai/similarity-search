@@ -28,15 +28,15 @@ void load_options(int argc, char** argv, parameter& para) {
 		("help,h", "help info")
 
 		("num_bit,l",		po::value<int >(&para.num_bit)->default_value(32)  , "num of hash bit")
-		("topK,k",		po::value<int >(&para.topK)->default_value(20)     , "size of result set")
 		("num_thread",		po::value<int >(&para.num_thread)->default_value(1), "num thread")
 		("dim,d", 		po::value<int >(&para.dim)->default_value(-1)      , "origin dimension of data")
 		("transformed_dim",	po::value<int >(&para.transformed_dim)->default_value(0)      , "origin dimension of data")
+		("num_sub_data_set",	po::value<int >(&para.num_sub_data_set)->default_value(-1), "number of sub data set")
 		
 		("train_data,t",  	po::value<string >(&para.train_data),   "data for training")
 		("base_data,b",		po::value<string >(&para.base_data) ,   "data saved in index")
 		("query_data,q",	po::value<string >(&para.query_data),   "data for query")
-		("ground_truth,g",	po::value<string >(&para.ground_truth), "ground truth")
+		("ground_truth,g",	po::value<string >(&para.ground_truth), "ground truth file")
 	;
 
 	po::variables_map vm;
@@ -52,28 +52,26 @@ void load_options(int argc, char** argv, parameter& para) {
 }
 
 template <class DataType, class IndexType, class QueryType>
-int execute(parameter& para) {
+int execute(parameter& para, int distance_metric) {
 
 	Bencher truthBencher(para.ground_truth.c_str());	
 
-	lshbox::Matrix<DataType> train_data(para.train_data, para.transformed_dim);
-	lshbox::Matrix<DataType> base_data (para.base_data,  para.transformed_dim);
-	lshbox::Matrix<DataType> query_data(para.query_data, para.transformed_dim);
-	
+	lshbox::Matrix<DataType> train_data(para.train_data);
+	lshbox::Matrix<DataType> base_data (para.base_data);
+	lshbox::Matrix<DataType> query_data(para.query_data);
+
+	para.topK = truthBencher.getTopK();	
 	para.train_size = train_data.getSize();
 	para.base_size  = base_data.getSize();
 	para.query_size = query_data.getSize();
-	para.dim = train_data.getDim();
+	para.dim = train_data.getDim() + para.transformed_dim;
 
 	IndexType * index = new IndexType(para);
 
-	index->preprocess_train(train_data);
-	index->preprocess_base(base_data);
-	index->preprocess_query(query_data);
 	index->train(train_data);
 	index->add(base_data);
 
-	lshbox::Metric<DataType > metric(para.dim, L2_DIST);
+	lshbox::Metric<DataType > metric(train_data.getDim(), distance_metric);
 	typename lshbox::Matrix<DataType >::Accessor accessor(base_data);
 
 	vector<QueryType * > queries;

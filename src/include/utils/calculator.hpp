@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 namespace ss {
 
 	template <class DataType >
@@ -23,6 +25,17 @@ namespace ss {
 		return sum;
 	}
 
+	template <class DataType>
+	DataType inline calculate_norm(const DataType * a, int dim) {
+		return std::sqrt(inner_product(a, a, dim));
+	}
+
+	template <class DataType>
+	void inline scale_data(DataType * target, const DataType * data, DataType scale, int dim) {
+		for (int d = 0; d<dim; d++) {
+			target[d] = data[d] / scale;
+		}
+	}
 
 	int inline countBitOne(unsigned long long xorval) {
 		int count = 0;
@@ -33,4 +46,5 @@ namespace ss {
 		}
 		return count;
 	}
+
 }

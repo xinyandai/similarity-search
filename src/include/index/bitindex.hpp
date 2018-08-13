@@ -28,22 +28,22 @@ namespace ss {
 
 		unordered_map<unsigned long long, vector<int> > & getIndexMap() { return _hash_map;  }
 
-		virtual void train(lshbox::Matrix<DataType >& ) = 0; 
+		virtual void train(const lshbox::Matrix<DataType >& ) = 0; 
 
-		virtual void add  (lshbox::Matrix<DataType >& data) {
-			
+		virtual void add  (const lshbox::Matrix<DataType >& data) {
+
 			for (int i=0; i<data.getSize(); ++i) {
 				unsigned long long hash_val = hash_data(data[i], i);
 				_hash_map[hash_val].push_back(i);
 			}
 		}
 
-		virtual unsigned long long hash_data(DataType * data, int id=-1)	{ return this->quantize(data, 0); }
-		virtual unsigned long long hash_query(DataType * query) 		{ return this->hash_data(query); }
+		virtual unsigned long long hash_data (const DataType * data, int id)	{ return this->quantize(data, 0); }
+		virtual unsigned long long hash_query(const DataType * query) 	{ return this->hash_data(query, -1); }
 
 	protected:
 
-		virtual unsigned long long quantize(DataType * data, DataType quantizor) {
+		virtual unsigned long long quantize(const DataType * data, DataType quantizor) {
 			unsigned long long value = 0;
 			for (int i=0; i<this->_para.num_bit; i++) {
 				DataType quantization =  ss::diff_product(data,  _means.data(), _projectors[i].data(), this->_para.dim ) ;	
@@ -54,7 +54,7 @@ namespace ss {
 			return value;
 		}
 
-		void initilize_means(lshbox::Matrix<DataType >& train_data) {
+		void initilize_means(const lshbox::Matrix<DataType >& train_data) {
 
 			vector<long double> sum(this->_para.dim, .0);	// use long double to make sure presision
 			for (int i=0; i < train_data.getSize(); i++) {	// one vector by one vector cache-friendly
