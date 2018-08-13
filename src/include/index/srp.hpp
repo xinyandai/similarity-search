@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <vector>
 #include <random>
-#include "../bitindex.hpp"
+#include "bitindex.hpp"
 namespace ss {
 
 	using namespace std;

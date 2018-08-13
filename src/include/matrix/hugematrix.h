@@ -141,9 +141,9 @@ public:
     Matrix(const Matrix& M) = delete;
     Matrix& operator=(const Matrix& M)  = delete;
 
-    std::vector<float> calNorms() {
-        std::vector<float> results(this->getSize());
-        float norm;
+    std::vector<T> calNorms() {
+        std::vector<T> results(this->getSize());
+        T norm;
         for (int i = 0; i < results.size(); ++i) {
             norm = 0;
             for (int idx = 0; idx < this->getDim(); ++idx) {

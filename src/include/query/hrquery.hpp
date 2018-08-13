@@ -2,7 +2,7 @@
 
 #include "../parameters.hpp"
 #include "../query.hpp"
-#include "../bitindex.hpp"
+#include "../index/bitindex.hpp"
 
 
 namespace ss {
