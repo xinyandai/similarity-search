@@ -1,8 +1,11 @@
 #pragma once
 
 #include <cmath>
+#include "vector"
 
 namespace ss {
+
+	using namespace std;
 
 	template <class DataType >
 	DataType inline inner_product(const DataType * a, const DataType * b, int dim) {
@@ -43,6 +46,17 @@ namespace ss {
 		while(xorval != 0) {
 			count++;
 			xorval &= (xorval-1);
+		}
+		return count;
+	}
+
+	template <class DataType >
+	int inline count_diff(const DataType * a,  const DataType * b, int dim) {
+		int count = 0;
+		for (int d=0; d<dim; d++) {
+			if (a[d]!=b[d]) {
+				count++;
+			}
 		}
 		return count;
 	}

@@ -27,11 +27,12 @@ void load_options(int argc, char** argv, parameter& para) {
 	opts.add_options()
 		("help,h", "help info")
 
-		("num_bit,l",		po::value<int >(&para.num_bit)->default_value(32)  , "num of hash bit")
-		("num_thread",		po::value<int >(&para.num_thread)->default_value(1), "num thread")
-		("dim,d", 		po::value<int >(&para.dim)->default_value(-1)      , "origin dimension of data")
-		("transformed_dim",	po::value<int >(&para.transformed_dim)->default_value(0)      , "origin dimension of data")
-		("num_sub_data_set",	po::value<int >(&para.num_sub_data_set)->default_value(-1), "number of sub data set")
+		("num_bit,l",		po::value<int 	>(&para.num_bit)->default_value(32)  , "num of hash bit")
+		("num_thread",		po::value<int 	>(&para.num_thread)->default_value(1), "num thread")
+		("dim,d", 		po::value<int 	>(&para.dim)->default_value(-1)      , "origin dimension of data")
+		("transformed_dim",	po::value<int 	>(&para.transformed_dim)->default_value(0)      , "origin dimension of data")
+		("num_sub_data_set",	po::value<int 	>(&para.num_sub_data_set)->default_value(-1), "number of sub data set")
+		("r,r",			po::value<float >(&para.r)->default_value(0.8), "quantization float 'w' in e2lsh, h(x)=ceil[(av+b)/w]")
 		
 		("train_data,t",  	po::value<string >(&para.train_data),   "data for training")
 		("base_data,b",		po::value<string >(&para.base_data) ,   "data saved in index")

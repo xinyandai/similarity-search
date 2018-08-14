@@ -23,6 +23,8 @@ struct parameter {
 	int train_size;
 	int query_size;
 	int base_size;
+
+	float r; // h(x) = ceil[(av+b)/r]
 	
 	boost::program_options::variables_map map;
 

@@ -48,7 +48,7 @@ namespace ss {
 
 		virtual void 	probeNextBucket() {
 
-			vector<int>& bucket = nextBucket();
+			const vector<int>& bucket = nextBucket();
 			assert(bucket.size() > 0);
 
 			for(int i=0; i<bucket.size(); i++)
@@ -56,7 +56,7 @@ namespace ss {
 		
 		}
 		
-		virtual vector<int>& nextBucket() = 0;
+		virtual const vector<int>& nextBucket() = 0;
 
 		inline 	int 	getNumItemsProbed() const { return _scanner.cnt(); }
 	

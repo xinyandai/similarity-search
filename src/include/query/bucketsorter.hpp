@@ -5,6 +5,8 @@
 #include <functional>
 #include <algorithm>
 
+#include "../utils/hashers.hpp"
+
 namespace ss {
 
 	using namespace std;
@@ -15,7 +17,8 @@ namespace ss {
 		vector<pair<DataType, KeyType > > _sorted_bucket;
 		int index = 0; 
 	public:
-		BucketSorter(const unordered_map<KeyType, vector<int>>& map, const std::function<DataType (const KeyType&)>& distor) {
+		//TODO remove the hasher function
+		BucketSorter(const unordered_map<KeyType, vector<int>, ss::SSHasher<KeyType > >& map, const std::function<DataType (const KeyType&)>& distor) {
 			_sorted_bucket.reserve(map.size());
 			for(auto it = map.begin(); it!=map.end(); it++) {
 				DataType distance = distor(it->first);

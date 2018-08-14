@@ -19,6 +19,7 @@ INCLUDE_DIRECTORIES(
 
 SET(EXAMPLES 
     search
+    e2lsh
     normrange
 )
 
