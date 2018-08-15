@@ -26,14 +26,14 @@ void load_options(int argc, char** argv, parameter& para) {
 		("help,h", "help info")
 
 		("num_bit,l",		po::value<int 	>(&para.num_bit)->default_value(32)  , "num of hash bit")
-		("num_thread",		po::value<int 	>(&para.num_thread)->default_value(1), "num thread")
+		("num_thread",		po::value<int 	>(&para.num_thread)->default_value(1), "num of thread")	//TODO to support multi thread
 		("dim,d", 		po::value<int 	>(&para.dim)->default_value(-1)      , "origin dimension of data")
 		("transformed_dim",	po::value<int 	>(&para.transformed_dim)->default_value(0)      , "origin dimension of data")
 		("num_sub_data_set",	po::value<int 	>(&para.num_sub_data_set)->default_value(-1), "number of sub data set")
 		("r,r",			po::value<float >(&para.r)->default_value(0.8), "quantization float 'w' in e2lsh, h(x)=ceil[(av+b)/w]")
 		
 		("train_data,t",  	po::value<string >(&para.train_data),   "data for training")
-		("base_data,b",		po::value<string >(&para.base_data) ,   "data saved in index")
+		("base_data,b",		po::value<string >(&para.base_data) ,   "data stored in index")
 		("query_data,q",	po::value<string >(&para.query_data),   "data for query")
 		("ground_truth,g",	po::value<string >(&para.ground_truth), "ground truth file")
 	;
@@ -52,12 +52,20 @@ void load_options(int argc, char** argv, parameter& para) {
 
 template <class DataType, class IndexType, class QueryType>
 int execute(parameter& para, int distance_metric) {
+	
+	ss::timer time_recorder;
 
+	cout	<< "==============================================================================" << endl;
+	cout	<< "==============================================================================" << endl;
+	cout << "[loading ] loading ground truth " << endl;
 	Bencher truthBencher(para.ground_truth.c_str());	
 
+	cout << "[loading ] loading fvecs data                                    " ;
+	time_recorder.restart();
 	lshbox::Matrix<DataType> train_data(para.train_data);
 	lshbox::Matrix<DataType> base_data (para.base_data);
 	lshbox::Matrix<DataType> query_data(para.query_data);
+	cout << "using time :" << time_recorder.elapsed() << endl;
 
 	para.topK = truthBencher.getTopK();	
 	para.train_size = train_data.getSize();
@@ -65,21 +73,36 @@ int execute(parameter& para, int distance_metric) {
 	para.query_size = query_data.getSize();
 	para.dim = train_data.getDim() + para.transformed_dim;
 
+	cout << "[training] initial the index." << endl;
 	IndexType * index = new IndexType(para);
 
-	index->train(train_data);
-	index->add(base_data);
+	cout << "[training] training the hash functions or models                 ";
+	time_recorder.restart();
+	index->train(train_data); 	// train the model, generate random vectors if using LSH, learn the projection vectors if using larning to hash method.(PCAH, ITQ, SH ...)
+	cout << "using time :" << time_recorder.elapsed() << endl;
 
-	lshbox::Metric<DataType > metric(train_data.getDim(), distance_metric);
-	typename lshbox::Matrix<DataType >::Accessor accessor(base_data);
+	cout << "[training] put data into index                                   ";
+	time_recorder.restart();
+	index->add(base_data);		// add database items into index, using the information(e.g. hahs function) learned/generated in training stage.
+	cout << "using time :" << time_recorder.elapsed() << endl;
 
-	vector<QueryType * > queries;
+	lshbox::Metric<DataType > 		metric(train_data.getDim(), distance_metric);
+	typename Matrix<DataType >::Accessor 	accessor(base_data);
+	
+	vector<QueryType * > 			queries;
+
+	
+	cout << "[querying] rank buckets for each query                           ";
+	time_recorder.restart();
 	for (int i = 0; i < para.query_size; i++) {
-		queries.push_back(new QueryType(index, query_data[i], metric, accessor, para ) );
+		queries.push_back(new QueryType(index, query_data[i], metric, accessor, para ) ); // determine the sequence of probing bucket(except probing by looking up)
 	}
+	cout << "using time :" << time_recorder.elapsed() << endl;
 
 	const char * spliter = ", ";
-	cout
+	cout	<< "==============================================================================" << endl;
+	cout	<< "==============================================================================" << endl;
+	cout	
 		<< "expected items" << spliter
 		<< "avg items" << spliter 
 		<< "overall time" << spliter 
@@ -88,25 +111,22 @@ int execute(parameter& para, int distance_metric) {
 		<< "avg error" 
 		<< "\n";
 
-	ss::timer time_recorder;
+	time_recorder.restart();
 	for (int numItems = 1; numItems/2 < para.base_size; numItems *=2 ) {
 		
-		if ( numItems > para.base_size ) 
+		if ( numItems > para.base_size ) 	
 			numItems = para.base_size;
-		
-		vector<vector<pair<float, unsigned>>> currentTopK;
-		currentTopK.reserve(para.query_size);
-		
-		vector<unsigned> numItemProbed;
-		numItemProbed.reserve(para.query_size);
+
+		vector<vector<pair<float, unsigned>>> 	currentTopK(para.query_size);	//TODO copy should be avoided
+		vector<unsigned> 			numItemProbed(para.query_size);
 
 		for (int i = 0; i <  para.query_size; i++) {
-			queries[i]->probeItems(numItems);
-			numItemProbed.emplace_back(queries[i]->getNumItemsProbed());
-			currentTopK.emplace_back(queries[i]->getSortedTopK());
+			queries[i]->probeItems(numItems);				// probe more bucket util the number of probed item is no less than {$numItems}
+			numItemProbed[i] 	= queries[i]->getNumItemsProbed();
+			currentTopK[i] 		= queries[i]->getSortedTopK();
 		}
 
-		// statistic such as recall precision
+		// statistic such as recall, precision, probing time and probed items
 		Bencher currentBencher(currentTopK, true);
 		cout
 			<< numItems <<  spliter 
