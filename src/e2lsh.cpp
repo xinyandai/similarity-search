@@ -12,7 +12,7 @@
 
 #include "executor.hpp"
 #include "include/index/e2lsh.hpp"
-#include "include/query/irquery.hpp"
+#include "include/query/int_ranker.hpp"
 
 using namespace std;
 using namespace ss;
@@ -23,6 +23,6 @@ int main(int argc, char** argv) {
 	using DataType = float;
 	parameter para;
 	load_options(argc, argv, para);
-	execute<DataType, ss::E2LSHIndex<DataType >, ss::IRQuery<DataType > >(para, L2_DIST);	
+	execute<DataType, ss::E2LSHIndex<DataType >, ss::IntRanker<DataType > >(para, L2_DIST);	
 }
 

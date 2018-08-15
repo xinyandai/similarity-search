@@ -1,10 +1,10 @@
 #pragma once
 
-#include "radixsorter.hpp"
+#include "sorter/radix_sorter.hpp"
 
 #include "../parameters.hpp"
 #include "../query.hpp"
-#include "../index/intindex.hpp"
+#include "../index/int_index.hpp"
 #include "../utils/calculator.hpp"
 
 namespace ss {
@@ -12,15 +12,19 @@ namespace ss {
 	using namespace lshbox;
 
 	template <class DataType>
-	class IRQuery : public Query<DataType > {
+	class IntRanker : public Query<DataType > {
+
 		using AccessorType = typename lshbox::Matrix<DataType>::Accessor;
 		using KeyType = vector<int >;
+
 	protected:
 		unordered_map<KeyType, vector<int>, ss::SSHasher<KeyType > > &	_index_map;
 		ss::RadixSorter<DataType, KeyType> *				_sorter;
+
 	public:
-		~IRQuery() { delete _sorter; }
-		IRQuery(IntIndex<DataType > *	 	index, 
+		~IntRanker() { delete _sorter; }
+		IntRanker(
+			IntIndex<DataType > *	 	index, 
 			DataType * 			query, 
 			lshbox::Metric<DataType > & 	metric, 
 			const AccessorType & 		accessor, 

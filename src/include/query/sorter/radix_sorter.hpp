@@ -1,11 +1,10 @@
 #pragma once
 
-#include<bitset>
+#include <bitset>
 
-#include "../parameters.hpp"
-#include "../query.hpp"
-#include "../index/bitindex.hpp"
-#include "../utils/hashers.hpp"
+#include "../../query.hpp"
+#include "../../index/bit_index.hpp"
+#include "../../utils/hashers.hpp"
 
 namespace ss {
 

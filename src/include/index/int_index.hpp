@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "mapindex.hpp"
+#include "map_index.hpp"
 #include "../utils/hashers.hpp"
 
 namespace ss {

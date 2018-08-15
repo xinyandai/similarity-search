@@ -5,8 +5,6 @@
 
 #include "include/parameters.hpp"
 #include "include/index.hpp"
-#include "include/index/srp.hpp"
-#include "include/query/hrquery.hpp"
 
 #include "include/bench/bencher.h"
 #include "include/bench/benchrecord.h"

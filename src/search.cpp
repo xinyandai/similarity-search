@@ -6,7 +6,7 @@
 #include "include/parameters.hpp"
 #include "include/index.hpp"
 #include "include/index/srp.hpp"
-#include "include/query/hrquery.hpp"
+#include "include/query/hamming_ranker.hpp"
 
 #include "include/bench/bencher.h"
 #include "include/bench/benchrecord.h"
@@ -26,6 +26,6 @@ int main(int argc, char** argv) {
 	using DataType = float;
 	parameter para;
 	load_options(argc, argv, para);
-	execute<DataType, SRPIndex<DataType >, HRQuery<DataType > >(para, L2_DIST);	
+	execute<DataType, SRPIndex<DataType >, HammingRanker<DataType > >(para, L2_DIST);	
 }
 

@@ -1,9 +1,10 @@
 #pragma once
 
+#include "sorter/bucket_sorter.hpp"
+
 #include "../parameters.hpp"
 #include "../query.hpp"
-#include "../index/normrange.hpp"
-#include  "bucketsorter.hpp"
+#include "../index/norm_range.hpp"
 
 namespace ss {
 

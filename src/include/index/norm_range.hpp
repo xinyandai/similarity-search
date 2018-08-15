@@ -6,7 +6,7 @@
 
 #include "../utils/calculator.hpp"
 
-#include "bitindex.hpp"
+#include "bit_index.hpp"
 #include "srp.hpp"
 
 namespace ss {

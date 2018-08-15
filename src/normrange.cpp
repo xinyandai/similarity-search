@@ -11,8 +11,8 @@
 #include "include/utils/util.hpp"
 
 #include "executor.hpp"
-#include "include/index/normrange.hpp"
-#include "include/query/normrangequery.hpp"
+#include "include/index/norm_range.hpp"
+#include "include/query/norm_range.hpp"
 
 using namespace std;
 using namespace ss;
