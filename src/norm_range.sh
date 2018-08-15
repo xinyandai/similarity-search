@@ -9,7 +9,7 @@ data_set="netflix"
 metric="product"
 
 gdb --args \
-./normrange \
+./norm_range \
 	-t ${data_dir}/${data_set}/${data_set}_base.fvecs \
 	-b ${data_dir}/${data_set}/${data_set}_base.fvecs \
 	-q ${data_dir}/${data_set}/${data_set}_query.fvecs  \

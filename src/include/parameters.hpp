@@ -16,6 +16,7 @@ struct parameter {
 	int num_thread;
 	int dim;
 	int transformed_dim;
+	int origin_dim;
 
 	int num_bit;
 	int num_sub_data_set;

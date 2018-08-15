@@ -3,6 +3,8 @@
 #include <cmath>
 #include "vector"
 
+#include <iostream>
+
 namespace ss {
 
 	using namespace std;
@@ -38,6 +40,24 @@ namespace ss {
 		for (int d = 0; d<dim; d++) {
 			target[d] = data[d] / scale;
 		}
+	}
+
+	template <class DataType>
+	void inline simpleLSH_transform(DataType * transform_buffer, const DataType * data, DataType norm, DataType scale, int origin_dim) {
+		
+			if (scale<norm) {
+				std::cerr <<"the vector's scale: "<< scale <<" is smaller than norm: " << norm <<std:: endl; 
+				scale = norm;
+			}
+			ss::scale_data(transform_buffer, data, scale, origin_dim);
+			transform_buffer[origin_dim] = std::sqrt(1 - norm*norm/scale/scale);
+	}
+
+	template <class DataType>
+	void inline simpleLSH_transform(DataType * transform_buffer, const DataType * data, int origin_dim) {
+		DataType norm = ss::calculate_norm(data, origin_dim);
+		ss::scale_data(transform_buffer, data, norm, origin_dim);
+		transform_buffer[origin_dim] = 0.0;
 	}
 
 	int inline countBitOne(unsigned long long xorval) {

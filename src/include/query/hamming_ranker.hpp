@@ -27,7 +27,7 @@ namespace ss {
 		~HammingRanker() { if(_sorter) delete _sorter; }
 
 		HammingRanker(
-			BitIndex<DataType > * 		index, 
+			MapIndex<DataType, KeyType > * 	index, 
 			DataType * 			query, 
 			lshbox::Metric<DataType > & 	metric, 
 			const AccessorType & 		accessor, 

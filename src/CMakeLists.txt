@@ -20,7 +20,8 @@ INCLUDE_DIRECTORIES(
 SET(EXAMPLES 
     search
     e2lsh
-    normrange
+    norm_range
+    simple_lsh
 )
 
 FOREACH(EXAMPLE ${EXAMPLES} )

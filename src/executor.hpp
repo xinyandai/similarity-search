@@ -72,6 +72,7 @@ int execute(parameter& para, int distance_metric) {
 	para.base_size  = base_data.getSize();
 	para.query_size = query_data.getSize();
 	para.dim = train_data.getDim() + para.transformed_dim;
+	para.origin_dim = train_data.getDim();
 
 	cout << "[training] initial the index." << endl;
 	IndexType * index = new IndexType(para);
