@@ -38,29 +38,19 @@ namespace ss {
 			_index->train(data);
 		}
 
-		inline void transform (const DataType *  data, DataType norm, DataType scale) {
-			if (scale<norm) {
-				std::cerr <<"the vector's scale: "<< scale <<" is smaller than norm: " << norm << endl; 
-				scale = norm;
-			}
-			int origin_dim = this->_para.dim - this->_para.transformed_dim;
-			ss::scale_data(_tranformed_data.data(), data, scale, origin_dim);
-			_tranformed_data[origin_dim] = std::sqrt(1 - norm*norm/scale/scale);
-		}
 
 		virtual unsigned long long hash_data(const DataType * data, int id) {
 			int sub_data_set = get_sub_data_set(id);
-			transform(data, _norms[id], _percentiles[sub_data_set]);
-			unsigned long long hash_value = _index->hash_data(_tranformed_data.data(), id);
+			DataType scale = _percentiles[sub_data_set];
+
+			ss::simpleLSH_transform(_tranformed_data.data(), data, _norms[id], scale, this->_para.origin_dim);
+			unsigned long long hash_value = _index->hash_data(_tranformed_data.data(), id); 
 			return (hash_value << _bit_sub_data_set) | sub_data_set;
 		}
 
 		virtual unsigned long long hash_query(const DataType * data) {
 
-			int origin_dim = this->_para.dim - this->_para.transformed_dim;
-			DataType norm = ss::calculate_norm(data, origin_dim);
-			ss::scale_data(_tranformed_data.data(), data, norm, origin_dim);
-			_tranformed_data[origin_dim] = 0.0;
+			ss::simpleLSH_transform(_tranformed_data.data(), data, this->_para.origin_dim);
 			return _index->hash_query(_tranformed_data.data());
 		}
 

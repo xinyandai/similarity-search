@@ -16,7 +16,7 @@ namespace ss {
 
 		virtual void train(const lshbox::Matrix<DataType > & data) {
 
-			this->initilize_means(data);
+//			this->initilize_means(data);
 
 			std::default_random_engine generator;
 			std::normal_distribution<DataType > distribution(0.0, 1.0);
