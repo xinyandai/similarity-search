@@ -3,6 +3,25 @@ similarity-search
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
 [![Build Status](https://travis-ci.com/xinyandai/similarity-search.svg?token=rQzxktTxAXqqyNh8ZrSa&branch=master)](https://travis-ci.com/xinyandai/similarity-search)
 ## A general framework for similarity search.
+# Run
+ script
+
+    git clone https://github.com/xinyandai/similarity-search.git
+    cd similarity-search
+    sh srp.sh
+
+ command
+
+    git clone https://github.com/xinyandai/similarity-search.git
+    cd similarity-search/src
+    mkdir build
+    cd build
+    cmake ..
+    make srp
+    ./srp -h
+    ./srp -t ${train_data_file} -b ${base_data_file} -q ${query_data_file}  -g ${ground_truth_file}
+
+You should predefine  ${train_data_file} ${base_data_file} ${query_data_file} ${ground_truth_file}.
 # process
   - 1. choose the index structure and query method
   - 2. load data, include training data, base data and query data, ground truth is needed for recall.
@@ -26,3 +45,4 @@ similarity-search
   - hamming rank
   - others
     - norm-range(for norm-range index only)
+
