@@ -4,7 +4,7 @@ cd build/
 cmake .. -DCMAKE_BUILD_TYPE=Debug
 # cmake .. -DCMAKE_BUILD_TYPE=Release
 make
-data_dir="/home/xinyan/programs/data"
+data_dir="../../data"
 data_set="netflix"
 metric="product"
 

@@ -18,7 +18,7 @@ INCLUDE_DIRECTORIES(
 )
 
 SET(EXAMPLES 
-    search
+    srp
     e2lsh
     norm_range
     simple_lsh
