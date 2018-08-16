@@ -36,7 +36,7 @@ namespace ss {
 			Query<DataType >(index, query, metric, accessor, para),
 			_index_map(index->getIndexMap()) {	
 			
-			KeyType query_hash = index->hash_query(query);
+			KeyType query_hash = index->hash_query(query, -1);
 			auto distor = [query_hash](const KeyType & index_key) {
 				return  ss::countBitOne(query_hash ^ index_key) ;
 			};

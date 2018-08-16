@@ -28,7 +28,7 @@ namespace ss {
 		SimpleLSHIndex(parameter& para) : 
 			MapIndex<DataType, KeyType >(para), 
 			_index(new HashingIndexType(para)),
-		       	_tranformed_data(para.dim + 1) {}
+		       	_tranformed_data(para.dim) {}
 
 		virtual void train(const lshbox::Matrix<DataType >& data) {
 
@@ -45,10 +45,10 @@ namespace ss {
 			return _index->hash_data(_tranformed_data.data(), id);
 		}
 
-		virtual KeyType hash_query(const DataType * data) {
+		virtual KeyType hash_query(const DataType * data, int id) {
 
 			ss::simpleLSH_transform(_tranformed_data.data(), data, this->_para.origin_dim);
-			return _index->hash_query(_tranformed_data.data());
+			return _index->hash_query(_tranformed_data.data(), id);
 		}
 
 	protected:

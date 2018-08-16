@@ -33,7 +33,7 @@ namespace ss {
 			Query<DataType >(index, query, metric, accessor, para),
 			_index_map(index->getIndexMap()) {
 			
-			KeyType query_hash = index->hash_query(query);
+			KeyType query_hash = index->hash_query(query, -1);
 			auto distor = [query_hash] (const KeyType & index_key) {
 				return ss::count_diff(query_hash.data(), index_key.data(), query_hash.size());
 			};

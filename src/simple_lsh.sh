@@ -15,5 +15,4 @@ gdb --args \
 	-q ${data_dir}/${data_set}/${data_set}_query.fvecs  \
 	-g ${data_dir}/${data_set}/${data_set}_${metric}_groundtruth.lshbox \
 	--transformed_dim 1 \
-	--num_bit 27 \
-       	--num_sub_data_set 32
+	--num_bit 32 

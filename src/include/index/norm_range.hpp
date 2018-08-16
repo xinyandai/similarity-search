@@ -48,10 +48,10 @@ namespace ss {
 			return (hash_value << _bit_sub_data_set) | sub_data_set;
 		}
 
-		virtual unsigned long long hash_query(const DataType * data) {
+		virtual unsigned long long hash_query(const DataType * data, int id) {
 
 			ss::simpleLSH_transform(_tranformed_data.data(), data, this->_para.origin_dim);
-			return _index->hash_query(_tranformed_data.data());
+			return _index->hash_query(_tranformed_data.data(), id);
 		}
 
 		int get_sub_data_set(int id) { //TODO should be optimized
@@ -65,6 +65,7 @@ namespace ss {
 		const std::vector<DataType >&	get_percentiles() { return _percentiles; }
 		const DataType			get_percentile(int i) { return _percentiles[i]; }
 
+		int bit_sub_data_set() { return _bit_sub_data_set; }
 		unsigned long long  get_sub_data_set_mask() {
 			static unsigned long long mask = (1<<_bit_sub_data_set) - 1; //2^i - 1 == 000000111111(i's 1 in low bits)
 			return mask;

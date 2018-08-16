@@ -41,8 +41,8 @@ namespace ss {
 			}
 		}
 
-		virtual KeyType hash_data (const DataType * data,  int id = -1)	{ return this->quantize(data); }
-		virtual KeyType hash_query(const DataType * query, int id = -1) { return this->hash_data(query, -1); }
+		virtual KeyType hash_data (const DataType * data,  int id)	{ return this->quantize(data); }
+		virtual KeyType hash_query(const DataType * query, int id) 	{ return this->hash_data(query, -1); }
 
 	protected:
 

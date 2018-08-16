@@ -32,10 +32,10 @@ namespace ss {
 				Query<DataType >(index, query, metric, accessor, para),
 				_index_map(index->getIndexMap()) {
 			
-			KeyType query_hash = index->hash_query(query);
+			KeyType query_hash = index->hash_query(query, -1);
 
 			auto distor = [&](const KeyType & key) {
-				int hamming_dist = ss::countBitOne(query_hash ^ key);	
+				int hamming_dist = ss::countBitOne(query_hash ^ (key>>index->bit_sub_data_set()) );	
 				int num_same_bit = para.num_bit - hamming_dist;
 				int interval_index = key & index->get_sub_data_set_mask();
 				DataType dist = - num_same_bit * index->get_percentile(interval_index);
