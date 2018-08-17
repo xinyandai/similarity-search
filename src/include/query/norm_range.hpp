@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 #include "sorter/bucket_sorter.hpp"
 
 #include "../parameters.hpp"
@@ -33,12 +35,18 @@ namespace ss {
 				_index_map(index->getIndexMap()) {
 			
 			KeyType query_hash = index->hash_query(query, -1);
+			const DataType PI = std::acos(-1);
 
-			auto distor = [&](const KeyType & key) {
-				int hamming_dist = ss::countBitOne(query_hash ^ (key>>index->bit_sub_data_set()) );	
-				int num_same_bit = para.num_bit - hamming_dist;
-				int interval_index = key & index->get_sub_data_set_mask();
-				DataType dist = - num_same_bit * index->get_percentile(interval_index);
+			auto distor = [&query_hash, &para, index, PI](const KeyType & key) {
+				std::pair<int, DataType > hash_dist_and_norm = index->hash_dist_and_percentile(key, query_hash);	
+				int num_same_bit = para.num_bit - hash_dist_and_norm.first;
+				DataType u = hash_dist_and_norm.second;
+				DataType dist = - (num_same_bit * u * u  ) ;
+				// DataType probability = num_same_bit / (DataType)para.num_bit;
+				// DataType scaled_probability = std::min(1.0f, probability + 3 * probability * (1-probability));
+				// DataType alpha = 0.3f;
+				// DataType scaled_probability = std::min(1.0f, probability * (1-alpha) + alpha);
+				// DataType dist = - u * std::cos( PI * (1.0f - scaled_probability) );
 				return dist;
 			};
 			_bucket_sorter = new BucketSorter<DataType, KeyType>(_index_map, distor);
