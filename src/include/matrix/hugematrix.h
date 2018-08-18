@@ -27,10 +27,10 @@
  * @brief Dataset management class.
  */
 #pragma once
-#include <fstream>
-#include <vector>
 #include <assert.h>
 #include <string.h>
+#include <fstream>
+#include <vector>
 #include <cmath>
 #include <iostream>
 #include <cstring>
@@ -46,14 +46,14 @@ namespace lshbox
 template <class T>
 class Matrix
 {
-    long dim;
-    long N;
+    uint64_t dim;
+    uint64_t N;
     T *dims;
 
     std::vector<T *> data;
     /** the number of vector each bucket contains */
-    long bucketSize;
-    const long max_alloc = 1024*1024*1024;
+    uint64_t bucketSize;
+    const uint64_t max_alloc = 1024*1024*1024;
 public:
     void free_() {
 	for(auto it = data.begin(); it != data.end(); ++it) {
@@ -63,7 +63,7 @@ public:
 
     void malloc_() {
     
-        bucketSize = (long) (max_alloc / dim);  // how many vectors each bucket contains
+        bucketSize = (uint64_t) (max_alloc / dim);  // how many vectors each bucket contains
         data.resize(1 + N / bucketSize);        // how many bucket we need
          
         for(int i=0; i<data.size()-1; i++) {
@@ -90,7 +90,7 @@ public:
     }
 
     Matrix(): dim(0), N(0) {}
-    Matrix(int _dim, int _N)
+    explicit Matrix(int _dim, int _N)
     {
         reset(_dim, _N);
     }
@@ -132,11 +132,11 @@ public:
         return N;
     }
 
-    Matrix(const std::string &path): dims(NULL)
+    explicit Matrix(const std::string &path): dims(NULL)
     {
         loadFvecs((*this), path);
     }
-    Matrix(const Matrix& M) = delete;
+    explicit Matrix(const Matrix& M) = delete;
     Matrix& operator=(const Matrix& M)  = delete;
 
     std::vector<T> calNorms() const {
@@ -164,7 +164,7 @@ public:
         typedef unsigned Key;
         typedef const T *Value;
         typedef T DATATYPE;
-        Accessor(const Matrix &matrix): matrix_(matrix)
+        explicit Accessor(const Matrix &matrix): matrix_(matrix)
         {
             flags_.resize(matrix_.getSize());
         }
@@ -195,7 +195,7 @@ public:
             std::cout << "cannot open file " << dataFile.c_str() << std::endl;
             assert(false);
         }
-        unsigned long fileSize = fin.tellg();
+        uint64_t fileSize = fin.tellg();
         fin.seekg(0, fin.beg);
         assert(fileSize != 0);
 
@@ -203,7 +203,7 @@ public:
         fin.read((char*)&dimension, sizeof(int));
         unsigned bytesPerRecord = dimension * sizeof(DATATYPE) + 4;
         assert(fileSize % bytesPerRecord == 0);
-        long cardinality = fileSize / bytesPerRecord;
+        uint64_t cardinality = fileSize / bytesPerRecord;
 
         data.reset(dimension, cardinality);
         fin.read((char *)(data[0]), sizeof(float) * dimension);

@@ -1,3 +1,25 @@
+//////////////////////////////////////////////////////////////////////////////
+/// Copyright 2018-present Xinyan DAI<xinyan.dai@outlook.com>
+///
+/// permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+/// documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+/// the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+/// and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+///
+/// The above copyright notice and this permission notice shall be included in all copies or substantial portions of
+/// the Software.
+///
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+/// THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+/// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+/// SOFTWARE.
+
+/// @version 0.1
+/// @author  Xinyan DAI
+/// @contact xinyan.dai@outlook.com
+//////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
 #include "sorter/radix_sorter.hpp"
@@ -19,29 +41,31 @@ namespace ss {
 
 	protected:
 		unordered_map<KeyType, vector<int>, ss::SSHasher<KeyType > > &	_index_map;
-		ss::RadixSorter<DataType, KeyType> *				_sorter;
+		ss::RadixSorter<DataType, KeyType> *							_sorter;
 
 	public:
 		~IntRanker() { delete _sorter; }
-		IntRanker(
+
+		explicit IntRanker(
 			IntIndex<DataType > *	 	index, 
-			DataType * 			query, 
-			lshbox::Metric<DataType > & 	metric, 
+			DataType * 					query,
+			lshbox::Metric<DataType > & metric,
 			const AccessorType & 		accessor, 
-			parameter & 			para) 
+			parameter & 				para)
 			:  
 			Query<DataType >(index, query, metric, accessor, para),
 			_index_map(index->getIndexMap()) {
 			
-			KeyType query_hash = index->hash_query(query, -1);
+			KeyType query_hash = index->HashQuery(query, -1);
 			auto distor = [query_hash] (const KeyType & index_key) {
-				return ss::count_diff(query_hash.data(), index_key.data(), query_hash.size());
+				return ss::CountDiff(query_hash.data(), index_key.data(), query_hash.size());
 			};
 			_sorter = new RadixSorter<DataType, KeyType>(index->getIndexMap(), distor, para.num_bit);
 		}
 
-		virtual const 	vector<int >& nextBucket() { return _index_map[_sorter->nextBucket()]; }
-		virtual bool 	nextBucketExisted() { return _sorter->nextBucketExisted(); }
+		const vector<int >& NextBucket() override { return _index_map[_sorter->NextBucket()]; }
+
+		bool NextBucketExisted() const override   { return _sorter->NextBucketExisted(); }
 	
 	};
 }

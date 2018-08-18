@@ -27,9 +27,10 @@
  * @brief A set of basic tools.
  */
 #pragma once
+#include <time.h>
 #include <string>
 #include <iostream>
-#include <time.h>
+
 namespace ss 
 {
 /**
@@ -43,7 +44,7 @@ class progress_display
 {
 public:
     explicit progress_display(
-        unsigned long expected_count,
+        uint64_t expected_count,
         std::ostream &os = std::cout,
         const std::string &s1 = "\n",
         const std::string &s2 = "",
@@ -52,7 +53,7 @@ public:
     {
         restart(expected_count);
     }
-    void restart(unsigned long expected_count)
+    void restart(uint64_t expected_count)
     {
         _count = _next_tic_count = _tic = 0;
         _expected_count = expected_count;
@@ -65,7 +66,7 @@ public:
             _expected_count = 1;
         }
     }
-    unsigned long operator += (unsigned long increment)
+    uint64_t operator += (uint64_t increment)
     {
         if ((_count += increment) >= _next_tic_count)
         {
@@ -73,15 +74,15 @@ public:
         }
         return _count;
     }
-    unsigned long operator ++ ()
+    uint64_t operator ++ ()
     {
         return operator += ( 1 );
     }
-    unsigned long count() const
+    uint64_t count() const
     {
         return _count;
     }
-    unsigned long expected_count() const
+    uint64_t expected_count() const
     {
         return _expected_count;
     }
@@ -90,7 +91,7 @@ private:
     const std::string m_s1;
     const std::string m_s2;
     const std::string m_s3;
-    unsigned long _count, _expected_count, _next_tic_count;
+    uint64_t _count, _expected_count, _next_tic_count;
     unsigned _tic;
     void display_tic()
     {

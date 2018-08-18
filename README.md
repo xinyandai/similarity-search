@@ -1,6 +1,7 @@
 similarity-search
 ==============
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/xinyandai/similarity-search/blob/master/LICENSE)
+)
 [![Build Status](https://travis-ci.com/xinyandai/similarity-search.svg?token=rQzxktTxAXqqyNh8ZrSa&branch=master)](https://travis-ci.com/xinyandai/similarity-search)
 ## A general framework for similarity search.
 # Run
@@ -45,4 +46,9 @@ You should predefine  ${train_data_file} ${base_data_file} ${query_data_file} ${
   - hamming rank
   - others
     - norm-range(for norm-range index only)
+
+# style check
+
+    pip install cpplint
+    cpplint --recursive --filter=-whitespace,-whitespace/line_length,-build/namespaces,-runtime/references,-eadability/todo,-readability/todo,-build/header_guard,-readability/namespace,-build/include_what_you_use,-readability/casting,-readability/braces,-runtime/indentation_namespace,-build/include_subdir  src/include/*
 

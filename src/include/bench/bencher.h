@@ -1,6 +1,25 @@
-/*
- * Bencher loads benchfile.lshbox and provides evaluations
- * */
+//////////////////////////////////////////////////////////////////////////////
+/// Copyright 2018-present Xinyan DAI<xinyan.dai@outlook.com>
+///
+/// permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+/// documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+/// the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+/// and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+///
+/// The above copyright notice and this permission notice shall be included in all copies or substantial portions of
+/// the Software.
+///
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+/// THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+/// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+/// SOFTWARE.
+
+/// @version 0.1
+/// @author  Xinyan DAI
+/// @contact xinyan.dai@outlook.com
+//////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 #include <iostream>
 #include <fstream>
@@ -28,7 +47,7 @@ public:
     int getTopK()	const { return topK; }
     int getQueries()	const { return queries; }
 
-    Bencher (const char* benchFile) {
+    explicit Bencher (const char* benchFile) {
         ifstream fin(benchFile);
         if (!benchFile) {
             cout << "cannot open benchFile: " << benchFile << endl;
@@ -58,7 +77,7 @@ public:
         fin.close();
     }
 
-    Bencher (const vector<vector<pair<float, unsigned>>>& source, bool isSorted = false) {
+    explicit Bencher (const vector<vector<pair<float, unsigned>>>& source, bool isSorted = false) {
         int numQueries = source.size();
         nns.reserve(numQueries);
 
@@ -117,7 +136,7 @@ public:
 
     float avg_items(const  vector<unsigned>& numItemProbed) {
     	if (numItemProbed.size() == 0) return 0;
-	unsigned long long sum = 0;
+	uint64_t sum = 0;
 	for (const unsigned& v : numItemProbed) {
 		sum += v;
 	}

@@ -27,10 +27,11 @@
  * @brief Dataset management class.
  */
 #pragma once
-#include <fstream>
-#include <vector>
 #include <assert.h>
 #include <string.h>
+
+#include <fstream>
+#include <vector>
 #include <cmath>
 #include <iostream>
 #include <cstring>
@@ -107,7 +108,7 @@ public:
     {
         return N;
     }
-    Matrix(const std::string &path): dims(NULL)
+    explicit Matrix(const std::string &path): dims(NULL)
     {
         loadFvecs((*this), path);
     }
@@ -139,7 +140,7 @@ public:
         typedef unsigned Key;
         typedef const T *Value;
         typedef T DATATYPE;
-        Accessor(const Matrix &matrix): matrix_(matrix)
+        explicit Accessor(const Matrix &matrix): matrix_(matrix)
         {
             flags_.resize(matrix_.getSize());
         }
@@ -170,7 +171,7 @@ public:
             std::cout << "cannot open file " << dataFile.c_str() << std::endl;
             assert(false);
         }
-        unsigned long fileSize = fin.tellg();
+        uint64_t fileSize = fin.tellg();
         fin.seekg(0, fin.beg);
         assert(fileSize != 0);
 
@@ -178,7 +179,7 @@ public:
         fin.read((char*)&dimension, sizeof(int));
         unsigned bytesPerRecord = dimension * sizeof(DATATYPE) + 4;
         assert(fileSize % bytesPerRecord == 0);
-        long cardinality = fileSize / bytesPerRecord;
+        uint64_t cardinality = fileSize / bytesPerRecord;
 
         data.reset(dimension, cardinality);
         fin.read((char *)(data[0]), sizeof(float) * dimension);
