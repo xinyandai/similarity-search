@@ -32,50 +32,52 @@
 #include "srp.hpp"
 
 namespace ss {
-	
-	using namespace std;
+    
+    using namespace std;
 
-	template<class DataType, class KeyType, class HashingIndexType>
-	class SimpleLSHIndex : public MapIndex<DataType, KeyType > {
+    template<class DataType, class KeyType, class HashingIndexType>
+    class SimpleLSHIndex : public MapIndex<DataType, KeyType > {
 
-	protected:
-		ss::MapIndex<DataType, KeyType > * 	_index;
-		std::vector<DataType>			    _norms;
-		DataType 				            _max_norm;
-		vector<DataType >  			        _transformed_data; // TODO UNsafe when use multi thread
+    protected:
+        ss::MapIndex<DataType, KeyType > *   _index;
+        std::vector<DataType>                _norms;
+        DataType                             _max_norm;
+        vector<DataType >                    _transformed_data; // TODO unsafe when use multi thread
 
-	public:
-		~SimpleLSHIndex() { 
-			delete _index; 
-		}
+    public:
+        ~SimpleLSHIndex() { 
+            delete _index; 
+        }
 
         explicit SimpleLSHIndex(parameter& para) :
-			MapIndex<DataType, KeyType >(para), 
-			_index(new HashingIndexType(para)),
-		       	_transformed_data(para.dim) {}
+            MapIndex<DataType, KeyType >(para),
+            _index(new HashingIndexType(para)),
+            _norms(),
+            _max_norm(0),
+            _transformed_data(para.dim) {}
 
         void Train(const lshbox::Matrix<DataType >& data) override {
 
-			_norms = data.calNorms(); // TODO should be optimized
-			_max_norm = *std::max_element(std::begin(_norms), std::end(_norms));
+            _norms = data.calNorms(); // TODO should be optimized
+            _max_norm = *std::max_element(std::begin(_norms), std::end(_norms));
 
             _index->Train(data);
-		}
+        }
 
 
         KeyType HashData(const DataType *data, int id) override {
 
             ss::SimpleLSHTransform(_transformed_data.data(), data, _norms[id], _max_norm, this->_para.origin_dim);
-			return _index->HashData(_transformed_data.data(), id);
-		}
+            return _index->HashData(_transformed_data.data(), id);
+        }
 
         KeyType HashQuery(const DataType *data, int id) override {
 
             ss::SimpleLSHTransform(_transformed_data.data(), data, this->_para.origin_dim);
-			return _index->HashQuery(_transformed_data.data(), id);
-		}
+            return _index->HashQuery(_transformed_data.data(), id);
+        }
 
-	protected:
-        KeyType Quantize(const DataType * data)  override {std::cerr << "should nerver be called" << std::endl;}
-	};
+    protected:
+        KeyType Quantize(const DataType * data)  override {std::cerr << "should never be called" << std::endl;}
+    };
 }

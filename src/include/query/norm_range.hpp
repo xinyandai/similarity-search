@@ -41,21 +41,19 @@ namespace ss {
         using KeyType      = uint64_t;
 
     protected:
-        unordered_map<KeyType, vector<int>, ss::SSHasher<KeyType> > &	_index_map;
-        BucketSorter<DataType, KeyType > *								_bucket_sorter;
+        unordered_map<KeyType, vector<int>, ss::SSHasher<KeyType> > & _index_map;
+        BucketSorter<DataType, KeyType > *                            _bucket_sorter;
 
     public:
-        ~NormRangeQuery() {delete _bucket_sorter; }
+        ~NormRangeQuery() { if(_bucket_sorter) delete _bucket_sorter; }
 
         explicit NormRangeQuery(
-				NormRangeIndex<DataType > * 	index,
-                DataType * 			            query,
-                lshbox::Metric<DataType > & 	metric,
-                const AccessorType & 		    accessor,
-                parameter & 			        para)
-                :
-                Query<DataType >(index, query, metric, accessor, para),
-                _index_map(index->getIndexMap()) {
+                NormRangeIndex<DataType > *     index,
+                DataType *                      query,
+                lshbox::Metric<DataType > &     metric,
+                const AccessorType &            accessor,
+                parameter &                     para)
+                : Query<DataType >(index, query, metric, accessor, para), _index_map(index->getIndexMap()) {
 
             KeyType query_hash = index->HashQuery(query, -1);
             const DataType PI = std::acos(-1);
@@ -76,9 +74,13 @@ namespace ss {
         }
 
 
-        const vector<int> &	NextBucket() override { return _index_map[_bucket_sorter->NextBucket()]; }
+        const vector<int> &  NextBucket() override {
+            return _index_map[_bucket_sorter->NextBucket()];
+        }
 
-        bool NextBucketExisted() const override   { return _bucket_sorter->NextBucketExisted(); }
+        bool NextBucketExisted() const override {
+            return _bucket_sorter->NextBucketExisted();
+        }
 
     };
 }

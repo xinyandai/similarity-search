@@ -37,9 +37,9 @@ using namespace lshbox;
 
 
 int main(int argc, char** argv) {
-	using DataType = float;
-	parameter para;
+    using DataType = float;
+    parameter para;
     LoadOptions(argc, argv, para);
-	SearchIterative<DataType, NormRangeIndex<DataType>, NormRangeQuery<DataType> >(para, IP_DIST);
+    SearchIterative<DataType, NormRangeIndex<DataType>, NormRangeQuery<DataType> >(para, IP_DIST);
 }
 

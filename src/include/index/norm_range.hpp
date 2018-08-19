@@ -35,83 +35,119 @@
 #include "srp.hpp"
 
 namespace ss {
-	
-	using namespace std;
+    
+    using namespace std;
 
-	template<class DataType, class KeyType=uint64_t, class HashingIndexType=SRPIndex<DataType > >
-	class NormRangeIndex : public BitIndex<DataType > {
-	protected:
-		BitIndex<DataType >* 	_index;
-		const int 				_num_sub_data_set;
-		const int  				_bit_sub_data_set;
-		std::vector<DataType>	_norms;
-		std::vector<DataType>	_percentiles;
-		vector<DataType >  		_transformed_data; // TODO unsafe when use multi thread
-	public:
-		~NormRangeIndex() { 
-			delete _index; 
-		}
+    template<class DataType, class KeyType=uint64_t, class HashingIndexType=SRPIndex<DataType > >
+    class NormRangeIndex : public BitIndex<DataType > {
+    protected:
+        BitIndex<DataType >*     _index;
+        const int                _num_sub_data_set;
+        const int                _bit_sub_data_set;
+        std::vector<DataType>    _norms;
+        std::vector<DataType>    _percentiles;
+        vector<DataType >        _transformed_data; // TODO unsafe when use multi thread
+    public:
+        ~NormRangeIndex() { 
+            delete _index; 
+        }
 
-		explicit NormRangeIndex(parameter& para) :
-				BitIndex<DataType >(para),
-				_index(new HashingIndexType(para)),
-				_transformed_data(para.dim + 1),
-				_num_sub_data_set(para.num_sub_data_set),
-				_bit_sub_data_set((int)std::ceil(std::log2(_num_sub_data_set))) {}
+        explicit NormRangeIndex(parameter& para) :
+                BitIndex<DataType >(para),
+                _index(new HashingIndexType(para)),
+                _transformed_data(para.dim + 1),
+                _num_sub_data_set(para.num_sub_data_set),
+                _bit_sub_data_set((int)std::ceil(std::log2(_num_sub_data_set))) {}
 
-		void Train(const lshbox::Matrix<DataType> &data) override {
-			_norms = data.calNorms(); //TODO should be optimized
-			InitializePercentile();
+        void Train(const lshbox::Matrix<DataType> &data) override {
+            _norms = data.calNorms(); //TODO should be optimized
+            InitializePercentile();
             _index->Train(data);
-		}
+        }
 
 
-		KeyType HashData(const DataType *data, int id) override {
-			int sub_data_set = GetSubDataSet(id);
-			DataType scale = _percentiles[sub_data_set];
+        /**
+         * returned Key is composed of hash_value and index of sud-data-set
+         * @param data pointer to data vector
+         * @param id the id of data
+         * @return
+         */
+        KeyType HashData(const DataType *data, int id) override {
+            int sub_data_set = GetSubDataSet(id);
+            DataType scale = _percentiles[sub_data_set];
 
             ss::SimpleLSHTransform(_transformed_data.data(), data, _norms[id], scale, this->_para.origin_dim);
-			KeyType hash_value = _index->HashData(_transformed_data.data(), id);
-			return this->MergeBucketKey(hash_value, sub_data_set);
-		}
+            KeyType hash_value = _index->HashData(_transformed_data.data(), id);
+            return this->MergeBucketKey(hash_value, sub_data_set);
+        }
 
-		KeyType HashQuery(const DataType *data, int id) override {
+        /**
+         * returned key is equal to hash values, because the query's norm is not important
+         * @param data pointer to query vector
+         * @param id query's id
+         * @return
+         */
+        KeyType HashQuery(const DataType *data, int id) override {
 
             ss::SimpleLSHTransform(_transformed_data.data(), data, this->_para.origin_dim);
-			return _index->HashQuery(_transformed_data.data(), id);
-		}
+            return _index->HashQuery(_transformed_data.data(), id);
+        }
 
-		int GetSubDataSet(int id) { //TODO should be optimized
-			assert(id>=0 && id<_norms.size());
-			DataType norm = _norms[id];
-			int i = 0;
-			while(i < _percentiles.size() && _percentiles[i++] <  norm) {}
-			// if i==_percentiles.size() , we use i-1; if _percentiles[i]<=norm we use i (we use 'i-1' because of 'i++')
-			return i-1;
-		}
+        /**
+         * determine which sub-data-set the data belongs to
+         * @postcondition make sure that _percentiles[index-1]<_norms[id]<=_percentiles[index]
+         * @param id
+         * @return index of sub-data-set
+         */
+        int GetSubDataSet(int id) { //TODO should be optimized
+            assert(id>=0 && id<_norms.size());
+            DataType norm = _norms[id];
+            int i = 0;
+            while(i < _percentiles.size() && _percentiles[i++] <  norm) {}
+            // if i==_percentiles.size() , we use i-1; if _percentiles[i]<=norm we use i (we use 'i-1' because of 'i++')
+            assert(_percentiles[i-1]>=norm);
+            if(i>1) assert(_percentiles[i-2]<norm);
+            return i-1;
+        }
 
 
-		std::pair<int, DataType> HashDistAndPercentile(const KeyType &bucket_key, const KeyType &query_hash) {
-			static KeyType mask = (1<<_bit_sub_data_set) - 1; //2^i - 1 == 000000111111(i's 1 in low bits)
-			int sub_data_set = bucket_key & mask;
-			int hash_dist = ss::CountBitOne(query_hash ^ (bucket_key >> _bit_sub_data_set));
-			return std::make_pair(hash_dist, _percentiles[sub_data_set]);
-		}
-		KeyType MergeBucketKey(const KeyType &hash_val, int sub_data_set) {
-			return  (hash_val << _bit_sub_data_set) | sub_data_set;
-		}
+        /**
+         * retrieve two things as follow:
+         * 1. the hash(the number of different hash value) distance between query's hash values and
+         * bucket_key(composed of hash_value and index of sud-data-set)
+         * 2. sub-data-set's maximum norm, aka, scale factor
+         * @param bucket_key
+         * @param query_hash
+         * @return
+         */
+        std::pair<int, DataType> HashDistAndPercentile(const KeyType &bucket_key, const KeyType &query_hash) {
+            static KeyType mask = (1<<_bit_sub_data_set) - 1; //2^i - 1 == 000000111111(i's 1 in low bits)
+            int sub_data_set = bucket_key & mask;
+            int hash_dist = ss::CountBitOne(query_hash ^ (bucket_key >> _bit_sub_data_set));
+            return std::make_pair(hash_dist, _percentiles[sub_data_set]);
+        }
 
-	protected:
-		void InitializePercentile() {
-			std::vector<DataType > norms = _norms;
-			std::sort(norms.begin(), norms.end());
-			
-			_percentiles.resize(_num_sub_data_set);
-			for (int i=0; i<_num_sub_data_set; i++) {
-				_percentiles[i] = norms[ norms.size() / _num_sub_data_set * (i+1) + norms.size() % _num_sub_data_set -1 ];
-			}
+        /**
+         * we choose to merge hash value and index of sub-data-set into one key, aka, bucket-key
+         * @param hash_val
+         * @param sub_data_set
+         * @return
+         */
+        KeyType MergeBucketKey(const KeyType &hash_val, int sub_data_set) {
+            return  (hash_val << _bit_sub_data_set) | sub_data_set;
+        }
 
-		}
+    protected:
+        void InitializePercentile() {
+            std::vector<DataType > norms = _norms;
+            std::sort(norms.begin(), norms.end());
+            
+            _percentiles.resize(_num_sub_data_set);
+            for (int i=0; i<_num_sub_data_set; i++) {
+                _percentiles[i] = norms[ norms.size() / _num_sub_data_set * (i+1) + norms.size() % _num_sub_data_set -1 ];
+            }
 
-	};
+        }
+
+    };
 }

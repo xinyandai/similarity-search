@@ -36,9 +36,9 @@ using namespace lshbox;
 
 
 int main(int argc, char** argv) {
-	using DataType = float;
-	parameter para;
+    using DataType = float;
+    parameter para;
     LoadOptions(argc, argv, para);
-	SearchIterative<DataType, ss::E2LSHIndex<DataType>, ss::IntRanker<DataType> >(para, L2_DIST);
+    SearchIterative<DataType, ss::E2LSHIndex<DataType>, ss::IntRanker<DataType> >(para, L2_DIST);
 }
 

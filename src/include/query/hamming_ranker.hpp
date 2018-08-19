@@ -33,41 +33,43 @@
 
 namespace ss {
 
-	using namespace lshbox;
+    using namespace lshbox;
 
-	template <class DataType>
-	class HammingRanker : public Query<DataType > {
+    template <class DataType>
+    class HammingRanker : public Query<DataType > {
 
-		using AccessorType 	= typename lshbox::Matrix<DataType>::Accessor;
-		using KeyType 		= uint64_t;
+        using AccessorType    = typename lshbox::Matrix<DataType>::Accessor;
+        using KeyType         = uint64_t;
 
-	protected:
-		std::unordered_map<KeyType, vector<int >, ss::SSHasher<KeyType> > &	_index_map;
-		RadixSorter<DataType, KeyType> *									_sorter;
+    protected:
+        std::unordered_map<KeyType, vector<int >, ss::SSHasher<KeyType> > & _index_map;
+        RadixSorter<DataType, KeyType> *                                    _sorter;
 
-	public:
-		~HammingRanker() { if(_sorter) delete _sorter; }
+    public:
+        ~HammingRanker() { if(_sorter) delete _sorter; }
 
-		explicit HammingRanker(
-			MapIndex<DataType, KeyType > * 	index, 
-			DataType * 						query,
-			lshbox::Metric<DataType > & 	metric, 
-			const AccessorType & 			accessor,
-			parameter & 					para)
-			:  
-			Query<DataType >(index, query, metric, accessor, para),
-			_index_map(index->getIndexMap()) {	
-			
-			KeyType query_hash = index->HashQuery(query, -1);
-			auto distor = [query_hash](const KeyType & index_key) {
-				return ss::CountBitOne(query_hash ^ index_key) ;
-			};
-			_sorter = new RadixSorter<DataType, KeyType>(index->getIndexMap(), distor, para.num_bit);
-		}
+        explicit HammingRanker(
+                MapIndex<DataType, KeyType > *     index,
+                DataType *                         query,
+                lshbox::Metric<DataType > &        metric,
+                const AccessorType &               accessor,
+                const parameter &                  para)
+                : Query<DataType >(index, query, metric, accessor, para), _index_map(index->getIndexMap()) {
+            
+            KeyType query_hash = index->HashQuery(query, -1);
+            auto distor = [query_hash](const KeyType & index_key) {
+                return ss::CountBitOne(query_hash ^ index_key) ;
+            };
+            _sorter = new RadixSorter<DataType, KeyType>(index->getIndexMap(), distor, para.num_bit);
+        }
 
-		const vector<int>&	NextBucket() override 	{ return _index_map[_sorter->NextBucket()]; }
+        const vector<int> & NextBucket() override {
+            return _index_map[_sorter->NextBucket()];
+        }
 
-		bool NextBucketExisted() const	override    { return _sorter->NextBucketExisted(); }
-	
-	};
+        bool NextBucketExisted() const override {
+            return _sorter->NextBucketExisted();
+        }
+    
+    };
 }

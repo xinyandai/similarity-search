@@ -29,79 +29,79 @@
 
 namespace ss {
 
-	using namespace std;
+    using namespace std;
 
-	template <class DataType >
-	DataType inline InnerProduct(const DataType *a, const DataType *b, int dim) {
+    template <class DataType >
+    DataType inline InnerProduct(const DataType *a, const DataType *b, int dim) {
 
-		DataType sum = .0;
-		for (int i = 0; i < dim; ++i) {
-			sum += a[i] * b[i];
-		}
-		return sum;
-	}
+        DataType sum = .0;
+        for (int i = 0; i < dim; ++i) {
+            sum += a[i] * b[i];
+        }
+        return sum;
+    }
 
 
-	template <class DataType>
-	DataType inline DiffProduct(const DataType *a, const DataType *means, const DataType *b, int dim) {
-	
-		DataType sum = .0;
-		for (int i = 0; i < dim; ++i) {
-			sum += (a[i] - means[i]) * b[i];
-		}
-		return sum;
-	}
+    template <class DataType>
+    DataType inline DiffProduct(const DataType *a, const DataType *means, const DataType *b, int dim) {
+    
+        DataType sum = .0;
+        for (int i = 0; i < dim; ++i) {
+            sum += (a[i] - means[i]) * b[i];
+        }
+        return sum;
+    }
 
-	template <class DataType>
-	DataType inline CalculateNorm(const DataType *a, int dim) {
-		return std::sqrt(InnerProduct(a, a, dim));
-	}
+    template <class DataType>
+    DataType inline CalculateNorm(const DataType *a, int dim) {
+        return std::sqrt(InnerProduct(a, a, dim));
+    }
 
-	template <class DataType>
-	void inline ScaleData(DataType *target, const DataType *data, DataType scale, int dim) {
-		for (int d = 0; d<dim; d++) {
-			target[d] = data[d] / scale;
-		}
-	}
+    template <class DataType>
+    void inline ScaleData(DataType *target, const DataType *data, DataType scale, int dim) {
+        for (int d = 0; d<dim; d++) {
+            target[d] = data[d] / scale;
+        }
+    }
 
-	template <class DataType>
-	void inline SimpleLSHTransform(DataType *transform_buffer, const DataType *data, DataType norm, DataType scale,
-								   int origin_dim) {
-		
-			if (scale<norm) {
-				std::cerr <<"the vector's scale: "<< scale <<" is smaller than norm: " << norm <<std:: endl; 
-				scale = norm;
-			}
-		ss::ScaleData(transform_buffer, data, scale, origin_dim);
-			transform_buffer[origin_dim] = std::sqrt(1 - norm*norm/scale/scale);
-	}
+    template <class DataType>
+    void inline SimpleLSHTransform(DataType *transform_buffer, const DataType *data, DataType norm, DataType scale,
+                                   int origin_dim) {
+        
+        if (scale<norm) {
+            std::cerr <<"the vector's scale: "<< scale <<" is smaller than norm: " << norm <<std:: endl;
+            scale = norm;
+        }
+        ss::ScaleData(transform_buffer, data, scale, origin_dim);
+        transform_buffer[origin_dim] = std::sqrt(1 - norm*norm/scale/scale);
+    }
 
-	template <class DataType>
-	void inline SimpleLSHTransform(DataType *transform_buffer, const DataType *data, int origin_dim) {
-		DataType norm = ss::CalculateNorm(data, origin_dim);
-		ss::ScaleData(transform_buffer, data, norm, origin_dim);
-		transform_buffer[origin_dim] = 0.0;
-	}
+    template <class DataType>
+    void inline SimpleLSHTransform(DataType *transform_buffer, const DataType *data, int origin_dim) {
+        DataType norm = ss::CalculateNorm(data, origin_dim);
+        ss::ScaleData(transform_buffer, data, norm, origin_dim);
+        transform_buffer[origin_dim] = 0.0;
+    }
 
-	int inline CountBitOne(uint64_t xorval) {
-		int count = 0;
+    int inline CountBitOne(uint64_t xorval) {
+        int count = 0;
 
-		while(xorval != 0) {
-			count++;
-			xorval &= (xorval-1);
-		}
-		return count;
-	}
+        while(xorval != 0) {
+            count++;
+            xorval &= (xorval-1);
+        }
+        return count;
+    }
 
-	template <class DataType >
-	int inline CountDiff(const DataType *a, const DataType *b, int dim) {
-		int count = 0;
-		for (int d=0; d<dim; d++) {
-			if (a[d]!=b[d]) {
-				count++;
-			}
-		}
-		return count;
-	}
+    template <class DataType >
+    int inline CountDiff(const DataType *a, const DataType *b, int dim) {
+        int count = 0;
+        for (int d=0; d<dim; d++) {
+            if (a[d]!=b[d]) {
+                count++;
+            }
+        }
+        return count;
+    }
 
 }

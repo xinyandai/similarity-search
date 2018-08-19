@@ -44,8 +44,8 @@ private:
     int topK;
     int queries;
 public:
-    int getTopK()	const { return topK; }
-    int getQueries()	const { return queries; }
+    int getTopK()    const { return topK; }
+    int getQueries() const { return queries; }
 
     explicit Bencher (const char* benchFile) {
         ifstream fin(benchFile);
@@ -58,7 +58,6 @@ public:
         getline(fin, line);
         istringstream issFirstLine(line);
         issFirstLine >>queries >> topK;
-	
 
         nns.reserve(queries);
         unsigned qid;
@@ -135,13 +134,13 @@ public:
     }
 
     float avg_items(const  vector<unsigned>& numItemProbed) {
-    	if (numItemProbed.size() == 0) return 0;
-	uint64_t sum = 0;
-	for (const unsigned& v : numItemProbed) {
-		sum += v;
-	}
-	double result = (double) sum / numItemProbed.size();
-	return ((float)result);
+        if (numItemProbed.size() == 0) return 0;
+    uint64_t sum = 0;
+    for (const unsigned& v : numItemProbed) {
+        sum += v;
+    }
+    double result = (double) sum / numItemProbed.size();
+    return ((float)result);
     }
 
     const BenchRecord& getRecord(unsigned qId) const {

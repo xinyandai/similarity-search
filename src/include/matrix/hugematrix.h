@@ -54,10 +54,11 @@ class Matrix
     /** the number of vector each bucket contains */
     uint64_t bucketSize;
     const uint64_t max_alloc = 1024*1024*1024;
+
 public:
     void free_() {
-	for(auto it = data.begin(); it != data.end(); ++it) {
-    	    delete [] (*it);
+    for(auto it = data.begin(); it != data.end(); ++it) {
+            delete [] (*it);
         }
      }
 
@@ -70,7 +71,7 @@ public:
             data[i] = new T[bucketSize * dim]; // bucket initialize
         }   
         // the last bucket's size contains the rest vectors
-	int rest = N  - bucketSize * (data.size() -1);
+        int rest = N  - bucketSize * (data.size() -1);
         data[data.size() - 1] = new T[rest * dim];
      }
 
@@ -85,8 +86,8 @@ public:
         dim = _dim;
         N = _N;
 
-	    free_();
-	    malloc_();
+        free_();
+        malloc_();
     }
 
     Matrix(): dim(0), N(0) {}
@@ -104,18 +105,18 @@ public:
     const T *operator [] (int i) const
     {
 
-	    int bucket = i / bucketSize;
-	    int offset = i % bucketSize;
-	    return data[bucket] + offset * dim;
+        int bucket = i / bucketSize;
+        int offset = i % bucketSize;
+        return data[bucket] + offset * dim;
     }
     /**
      * Access the ith vector.
      */
     T *operator [] (int i)
     {
-    	int bucket = i / bucketSize;
-	    int offset = i % bucketSize;
-	    return data[bucket] + offset * dim;
+        int bucket = i / bucketSize;
+        int offset = i % bucketSize;
+        return data[bucket] + offset * dim;
     }
     /**
      * Get the dimension.

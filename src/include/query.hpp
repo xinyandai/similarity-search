@@ -31,62 +31,70 @@
 
 namespace ss {
 
-	using namespace lshbox;
+    using namespace lshbox;
 
-	template <class DataType>
-	class Query  {
-		using AccessorType = typename lshbox::Matrix<DataType>::Accessor;
-	
-	private:
-		Index<DataType >*				_index;
-		DataType*						_query;
-		lshbox::Scanner<AccessorType >	_scanner;
-		parameter& 						_para;
+    template <class DataType>
+    class Query  {
+        using AccessorType = typename lshbox::Matrix<DataType>::Accessor;
+    
+    private:
+        Index<DataType >*                _index;
+        DataType*                        _query;
+        lshbox::Scanner<AccessorType >   _scanner;
+        const parameter &                _para;
 
-	public:
-		Query(Index<DataType > *            index,
-				DataType *                  query,
-				lshbox::Metric<DataType > & metric,
-				const AccessorType &        accessor,
-				parameter &                 para)
-			:
-			_index(index), 
-			_query(query), 
-			_scanner(accessor, metric, para.topK), 
-			_para(para) {
-			
-			_scanner.reset(query);
-		}
+    public:
+        Query(Index<DataType > *            index,
+                DataType *                  query,
+                lshbox::Metric<DataType > & metric,
+                const AccessorType &        accessor,
+                const parameter &           para)
+            :
+            _index(index), 
+            _query(query), 
+            _scanner(accessor, metric, para.topK), 
+            _para(para) {
+            
+            _scanner.reset(query);
+        }
 
-		virtual ~Query() {}
-		
-		/**
-		 * 
-		 */	
-		virtual void ProbeItems(const int num_items) {
+        virtual ~Query() {}
+        
+        /**
+         * 
+         */    
+        virtual void ProbeItems(const int num_items) {
 
-			while(GetNumItemsProbed() < num_items && NextBucketExisted()) {
+            while(GetNumItemsProbed() < num_items && NextBucketExisted()) {
 
-				const vector<int>& bucket = NextBucket();
-				assert(bucket.size() > 0);
+                const vector<int>& bucket = NextBucket();
+                assert(bucket.size() > 0);
 
-				for(int i=0; i<bucket.size(); i++)
-					// _scanner.operator() do three things:
-					// 1. calculate the true distance between query and bucekt[i] 
-					// 2. try to put bucket[i] into topK(heap) 
-					// 3. mark bucket[i] is visited
-					_scanner(bucket[i]); 
-			}
-		}
+                for(int i=0; i<bucket.size(); i++)
+                    // _scanner.operator() do three things:
+                    // 1. calculate the true distance between query and bucekt[i] 
+                    // 2. try to put bucket[i] into topK(heap) 
+                    // 3. mark bucket[i] is visited
+                    _scanner(bucket[i]); 
+            }
+        }
 
-		/**
-		 * return the next bucket should be visited/probed.
-		 * should be implement by specific class, such as Hamming Ranking for BitIndex, Int Ranking for IntIndex...
-		 */
-		virtual const 	vector<int>& NextBucket() = 0;
-		virtual bool 	NextBucketExisted() const { return GetNumItemsProbed() < _para.base_size; }
+        /**
+         * return the next bucket should be visited/probed.
+         * should be implement by specific class, such as Hamming Ranking for BitIndex, Int Ranking for IntIndex...
+         */
+        virtual const vector<int>& NextBucket() = 0;
 
-		inline 	int 	GetNumItemsProbed() const { return _scanner.cnt(); }
-		inline 	const 	vector<pair<float, unsigned>>& GetSortedTopK() { return  _scanner.getMutableTopk().genTopk(); }
-	};
+        virtual bool NextBucketExisted() const {
+            return GetNumItemsProbed() < _para.base_size;
+        }
+
+        inline     int     GetNumItemsProbed() const {
+            return _scanner.cnt();
+        }
+
+        inline const vector<pair<float, unsigned>> & GetSortedTopK() {
+            return  _scanner.getMutableTopk().genTopk();
+        }
+    };
 }

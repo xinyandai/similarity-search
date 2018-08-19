@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-/// Copyright 2018-present Xinyan DAI<xinyan.dai@outlook.com>
+/// Copyright 2018-present      DAI<    .dai@outlook.com>
 ///
 /// permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 /// documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -16,8 +16,8 @@
 /// SOFTWARE.
 
 /// @version 0.1
-/// @author  Xinyan DAI
-/// @contact xinyan.dai@outlook.com
+/// @author       DAI
+/// @contact     .dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -29,30 +29,25 @@ namespace ss{
 
 
 struct parameter {
-	std::string train_data;
-	std::string base_data;
-	std::string query_data;
-	std::string ground_truth;
+    std::string train_data;
+    std::string base_data;
+    std::string query_data;
+    std::string ground_truth;
 
-	int topK;
-	int num_thread;
-	int dim;
-	int transformed_dim;
-	int origin_dim;
+    int topK;
+    int num_thread;
+    int dim;
+    int transformed_dim;
+    int origin_dim;
 
-	int num_bit;
-	int num_sub_data_set;
+    int num_bit;
+    int num_sub_data_set;
 
-	int train_size;
-	int query_size;
-	int base_size;
+    int train_size;
+    int query_size;
+    int base_size;
 
-	float r; // h(x) = ceil[(av+b)/r]
-	
-	boost::program_options::variables_map map;
-
-	template<class VaribleType>
-	VaribleType get(const char * key) {	return map[key].as<VaribleType>(); }
+    float r; // h(x) = ceil[(av+b)/r]
 
 } typedef parameter;
 

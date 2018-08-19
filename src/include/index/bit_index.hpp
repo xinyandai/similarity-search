@@ -31,31 +31,30 @@
 
 namespace ss {
 
-	using namespace std;
+    using namespace std;
 
-	template<class DataType>
-	class BitIndex : public MapIndex<DataType, uint64_t > {
+    template<class DataType>
+    class BitIndex : public MapIndex<DataType, uint64_t > {
 
-		using KeyType = uint64_t;
-	protected:
-		DataType quantizor = 0;
-	public:
-		explicit BitIndex(parameter& para) : MapIndex<DataType, KeyType >(para){}
+        using KeyType = uint64_t;
+    protected:
+        DataType quantizor = 0;
+    public:
+        explicit BitIndex(parameter& para) : MapIndex<DataType, KeyType >(para){}
 
-		virtual void Train(const lshbox::Matrix<DataType> &) = 0;
+        virtual void Train(const lshbox::Matrix<DataType> &) = 0;
 
-	protected:
+    protected:
 
-		KeyType Quantize(const DataType *data) override {
-			KeyType value = 0;
-			for (int i=0; i<this->_para.num_bit; i++) {
-				DataType quantization = ss::DiffProduct(data, this->_means.data(), this->_projectors[i].data(),
+        KeyType Quantize(const DataType *data) override {
+            KeyType value = 0;
+            for (int i=0; i<this->_para.num_bit; i++) {
+                DataType quantization = ss::DiffProduct(data, this->_means.data(), this->_projectors[i].data(),
                                                         this->_para.dim) ;
-				value <<= 1;
-				value |= (quantization>quantizor) ? 1 :0;
-			}
-			return value;
-		}
-	};
-	
+                value <<= 1;
+                value |= (quantization>quantizor) ? 1 :0;
+            }
+            return value;
+        }
+    };
 }
