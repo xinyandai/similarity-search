@@ -46,7 +46,7 @@ namespace ss {
         unordered_map<KeyType, vector<int>, ss::SSHasher<KeyType > > _hash_map;
         vector<vector<DataType > >                                   _projectors;
     public:
-        explicit MapIndex(parameter& para) :
+        explicit MapIndex(const parameter& para) :
             Index<DataType >(para),
             _means(para.dim, 0),
             _projectors(para.num_bit, vector<DataType >(para.dim, 0)) {}

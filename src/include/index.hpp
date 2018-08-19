@@ -36,9 +36,9 @@ namespace ss {
     class Index {
     
     protected:
-        parameter& _para;
+        const parameter & _para;
     public:
-        explicit Index(parameter& para): _para(para) {}
+        explicit Index(const parameter& para): _para(para) {}
     
         /**
          * For Locality Sensitive Hashing, random vectors will be generated for projection and the training data won't be used

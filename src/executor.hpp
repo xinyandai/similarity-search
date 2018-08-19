@@ -54,6 +54,7 @@ void LoadOptions(int argc, char **argv, parameter &para) {
         ("transformed_dim",  po::value<int   >(&para.transformed_dim)->default_value(0)  , "origin dimension of data")
         ("num_sub_data_set", po::value<int   >(&para.num_sub_data_set)->default_value(-1), "number of sub data set")
         ("r,r",              po::value<float >(&para.r)->default_value(0.8),               "float 'w' in e2lsh")
+        ("iteration,i",      po::value<int   >(&para.iteration)->default_value(10),        "training iterations")
 
         ("train_data,t",     po::value<string >(&para.train_data),                         "data for training")
         ("base_data,b",      po::value<string >(&para.base_data) ,                         "data stored in index")

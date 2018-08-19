@@ -40,7 +40,7 @@ namespace ss {
     protected:
         DataType quantizor = 0;
     public:
-        explicit BitIndex(parameter& para) : MapIndex<DataType, KeyType >(para){}
+        explicit BitIndex(const parameter& para) : MapIndex<DataType, KeyType >(para){}
 
         virtual void Train(const lshbox::Matrix<DataType> &) = 0;
 

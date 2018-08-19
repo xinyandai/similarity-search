@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-/// Copyright 2018-present      DAI<    .dai@outlook.com>
+/// Copyright 2018-present Xinyan DAI<xinyan.dai@outlook.com>
 ///
 /// permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 /// documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -16,41 +16,29 @@
 /// SOFTWARE.
 
 /// @version 0.1
-/// @author       DAI
-/// @contact     .dai@outlook.com
+/// @author  Xinyan DAI
+/// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
-
-#pragma once
-
 #include <iostream>
-#include <boost/program_options.hpp>
-
-namespace ss{
 
 
-struct parameter {
-    std::string train_data;
-    std::string base_data;
-    std::string query_data;
-    std::string ground_truth;
+#include "include/parameters.hpp"
+#include "include/index/itq.hpp"
+#include "include/query/hamming_ranker.hpp"
 
-    int topK;
-    int num_thread;
-    int dim;
-    int transformed_dim;
-    int origin_dim;
+#include "executor.hpp"
 
-    int num_bit;
-    int num_sub_data_set;
+using namespace std;
+using namespace ss;
+using namespace lshbox;
 
-    int train_size;
-    int query_size;
-    int base_size;
 
-    int iteration; // training iteraions
-
-    float r; // h(x) = ceil[(av+b)/r]
-
-} typedef parameter;
-
+int main(int argc, char** argv) {
+    parameter para;
+    LoadOptions(argc, argv, para);
+    using DataType = float;
+    using IndexType = ITQIndex<DataType>;
+    using QueryType = HammingRanker<DataType> ;
+    SearchIterative<DataType, IndexType, QueryType>(para, L2_DIST);
 }
+

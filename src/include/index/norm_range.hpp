@@ -46,7 +46,7 @@ namespace ss {
         const int                _bit_sub_data_set;
         std::vector<DataType>    _norms;
         std::vector<DataType>    _percentiles;
-        vector<DataType >        _transformed_data; // TODO unsafe when use multi thread
+        vector<DataType >        _transformed_data; /// TODO(Xinyan ): unsafe when use multi thread. (thread_local)
     public:
         ~NormRangeIndex() { 
             delete _index; 
@@ -60,7 +60,7 @@ namespace ss {
                 _bit_sub_data_set((int)std::ceil(std::log2(_num_sub_data_set))) {}
 
         void Train(const lshbox::Matrix<DataType> &data) override {
-            _norms = data.calNorms(); //TODO should be optimized
+            _norms = data.calNorms(); /// TODO(Xinyan: ): should be improved
             InitializePercentile();
             _index->Train(data);
         }
@@ -99,7 +99,7 @@ namespace ss {
          * @param id
          * @return index of sub-data-set
          */
-        int GetSubDataSet(int id) { //TODO should be optimized
+        int GetSubDataSet(int id) { /// TODO(Xinyan): should avoid linear scan.
             assert(id>=0 && id<_norms.size());
             DataType norm = _norms[id];
             int i = 0;

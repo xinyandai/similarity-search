@@ -5,27 +5,26 @@ project(SimilaritySearch)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 find_package(Boost COMPONENTS system filesystem regex thread program_options date_time chrono)
-if(NOT Boost_FOUND)
-	message("NOT FOUND BOOST")
-endif()
+find_package (Eigen3 REQUIRED NO_MODULE)
 
 include_directories(${Boost_INCLUDE_DIRS})
 
 link_libraries(-lpthread)
 
 INCLUDE_DIRECTORIES(
-	${SimilaritySearch_SOURCE_DIR}/include
+    ${SimilaritySearch_SOURCE_DIR}/include
 )
 
-SET(EXAMPLES 
-    srp
-    e2lsh
-    norm_range
-    simple_lsh
+SET(EXAMPLES
+        srp
+        e2lsh
+        itq
+        norm_range
+        simple_lsh
 )
 
 FOREACH(EXAMPLE ${EXAMPLES} )
-	ADD_EXECUTABLE(${EXAMPLE} ${EXAMPLE}.cpp)
-	target_link_libraries(${EXAMPLE} ${Boost_LIBRARIES})
+    ADD_EXECUTABLE(${EXAMPLE} ${EXAMPLE}.cpp)
+    target_link_libraries(${EXAMPLE} ${Boost_LIBRARIES})
 ENDFOREACH(EXAMPLE)
 

@@ -42,7 +42,7 @@ namespace ss {
         ss::MapIndex<DataType, KeyType > *   _index;
         std::vector<DataType>                _norms;
         DataType                             _max_norm;
-        vector<DataType >                    _transformed_data; // TODO unsafe when use multi thread
+        vector<DataType >                    _transformed_data; /// TODO(Xinyan ): unsafe when use multi thread.
 
     public:
         ~SimpleLSHIndex() { 
@@ -58,7 +58,7 @@ namespace ss {
 
         void Train(const lshbox::Matrix<DataType >& data) override {
 
-            _norms = data.calNorms(); // TODO should be optimized
+            _norms = data.calNorms();
             _max_norm = *std::max_element(std::begin(_norms), std::end(_norms));
 
             _index->Train(data);

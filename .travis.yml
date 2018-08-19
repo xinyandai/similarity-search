@@ -13,6 +13,7 @@ addons:
       - g++-6
       - cmake
 before_script:
+  - sudo apt-get install libeigen3-dev
   - sudo apt-get install libboost-all-dev
 script:
   # Check versions of gcc, g++ and cmake

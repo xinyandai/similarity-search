@@ -39,7 +39,7 @@ namespace ss {
         vector<pair<DataType, KeyType > > _sorted_bucket;
         int index = 0; 
     public:
-        //TODO remove the hash function
+        /// TODO(Xinyan): remove the hash function
         explicit BucketSorter(
                 const unordered_map<KeyType, vector<int>, ss::SSHasher<KeyType > > &    map,
                 const std::function<DataType (const KeyType&)> &                        distor) {
