@@ -4,6 +4,7 @@ language:
   - cpp
 compiler:
   - gcc
+  - clang
 addons:
   apt:
     sources:
@@ -13,12 +14,13 @@ addons:
       - g++-6
       - cmake
 before_script:
-  - sudo apt-get install libeigen3-dev
   - sudo apt-get install libboost-all-dev
+  - sudo apt-get install libeigen3-dev
 script:
   # Check versions of gcc, g++ and cmake
   - gcc -v && g++ -v && cmake --version
   - dpkg -S /usr/include/boost/version.hpp
+  - ls /usr/include/eigen3/
   # Run your build commands next\
   - mkdir release
   - cd release
