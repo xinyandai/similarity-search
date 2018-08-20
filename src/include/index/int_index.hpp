@@ -40,7 +40,7 @@ namespace ss {
     protected:
         DataType _r;
     public:
-        explicit IntIndex(parameter& para) : MapIndex<DataType, KeyType >(para), _r(para.r){}
+        explicit IntIndex(const parameter& para) : MapIndex<DataType, KeyType >(para), _r(para.r){}
 
         virtual void Train(const lshbox::Matrix<DataType> &) = 0;
 

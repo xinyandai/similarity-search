@@ -40,6 +40,9 @@ struct parameter {
     int transformed_dim;
     int origin_dim;
 
+    int kmeans_centers;
+    int num_codebook;
+
     int num_bit;
     int num_sub_data_set;
 

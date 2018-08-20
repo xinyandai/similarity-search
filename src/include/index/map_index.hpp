@@ -47,13 +47,16 @@ namespace ss {
         vector<vector<DataType > >                                   _projectors;
     public:
         explicit MapIndex(const parameter& para) :
-            Index<DataType >(para),
-            _means(para.dim, 0),
-            _projectors(para.num_bit, vector<DataType >(para.dim, 0)) {}
+                Index<DataType >(para),
+                _means(para.dim, 0),
+                _projectors(para.num_bit, vector<DataType >(para.dim, 0)) {}
+
 
         unordered_map<KeyType, vector<int>, SSHasher<KeyType > > & getIndexMap() { return _hash_map;  }
 
+
         virtual void Train(const lshbox::Matrix<DataType> &) =0 ;
+
 
         void Add(const lshbox::Matrix<DataType> &data) override {
 
@@ -62,6 +65,7 @@ namespace ss {
                 _hash_map[hash_val].push_back(i);
             }
         }
+
 
         virtual KeyType HashData(const DataType *data, int id)   { return this->Quantize(data); }
         virtual KeyType HashQuery(const DataType *query, int id) { return this->HashData(query, -1); }

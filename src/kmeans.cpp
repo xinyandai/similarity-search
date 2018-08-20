@@ -19,36 +19,31 @@
 /// @author  Xinyan DAI
 /// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
+#include <iostream>
 
-#pragma once
+#include "include/parameters.hpp"
+#include "include/matrix.h"
+#include "include/metric.h"
 
-#include <unordered_map>
-#include <vector>
-#include <random>
-#include "int_index.hpp"
-namespace ss {
+#include "include/index/kmeans.hpp"
+#include "include/query/cluster_ranker.hpp"
 
-    using namespace std;
+#include "executor.hpp"
 
-    template<class DataType>
-    class E2LSHIndex : public IntIndex<DataType> {
-    public:
-        explicit E2LSHIndex(const parameter& para) : IntIndex<DataType >(para) {}
 
-        void Train(const lshbox::Matrix<DataType> &) override {
+using namespace std;
+using namespace ss;
+using namespace lshbox;
 
-            std::default_random_engine          generator;
-            std::normal_distribution<DataType > distribution(0.0, 1.0);
 
-            for (int i = 0; i<this->_para.num_bit; i++) {
-                for (int j=0; j<this->_para.dim; j++) {
-                    this->_projectors[i][j] = distribution(generator);
-                }
-            }
+int main(int argc, char** argv) {
+    using DataType = float;
 
-            this->_r = this->_para.r;
-        }
+    using IndexType =  ss::KMeansIndex<DataType >;
+    using QueryType =  ss::ClusterRanker<DataType >;
 
-    };
-
+    parameter para;
+    LoadOptions(argc, argv, para);
+    SearchIterative<DataType, IndexType, QueryType>(para, L2_DIST);
 }
+

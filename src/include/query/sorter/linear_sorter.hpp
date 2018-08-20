@@ -24,31 +24,48 @@
 
 #include <unordered_map>
 #include <vector>
-#include <random>
-#include "int_index.hpp"
+#include <functional>
+#include <algorithm>
+
+#include "../../utils/hashers.hpp"
+
 namespace ss {
 
     using namespace std;
 
     template<class DataType>
-    class E2LSHIndex : public IntIndex<DataType> {
+    class LinearSorter {
+    protected:
+        vector<pair<DataType, int > > _sorted_clusters;
+        int index = 0;
     public:
-        explicit E2LSHIndex(const parameter& para) : IntIndex<DataType >(para) {}
+        explicit LinearSorter(
+                const int                                       clusters,
+                const std::function<DataType (const int&)> &    distor) {
 
-        void Train(const lshbox::Matrix<DataType> &) override {
-
-            std::default_random_engine          generator;
-            std::normal_distribution<DataType > distribution(0.0, 1.0);
-
-            for (int i = 0; i<this->_para.num_bit; i++) {
-                for (int j=0; j<this->_para.dim; j++) {
-                    this->_projectors[i][j] = distribution(generator);
-                }
+            _sorted_clusters.reserve(clusters);
+            for(int i=0; i<clusters; ++i) {
+                DataType distance = distor(i);
+                _sorted_clusters.emplace_back(std::make_pair(distance, i ) );
             }
 
-            this->_r = this->_para.r;
+            std::sort(
+                    _sorted_clusters.begin(),
+                    _sorted_clusters.end(),
+                    [](const pair<float, unsigned>& a, const pair<float, unsigned>& b) {
+                        if (a.first != b.first)
+                            return a.first < b.first;
+                        else
+                            return a.second < b.second;
+                    });
         }
 
-    };
+        virtual int NextBucket() {
+            return _sorted_clusters[index++].second;
+        }
 
+        virtual bool NextBucketExisted() {
+            return index < _sorted_clusters.size();
+        }
+    };
 }

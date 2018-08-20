@@ -32,6 +32,17 @@ namespace ss {
     using namespace std;
 
     template <class DataType >
+    DataType inline EuclidDistance(const DataType *a, const DataType *b, int dim) {
+
+        DataType sum = .0;
+        for (int i = 0; i < dim; ++i) {
+            sum += (a[i] - b[i]) * (a[i] - b[i]);
+        }
+        return sqrt(sum);
+    }
+
+
+    template <class DataType >
     DataType inline InnerProduct(const DataType *a, const DataType *b, int dim) {
 
         DataType sum = .0;
