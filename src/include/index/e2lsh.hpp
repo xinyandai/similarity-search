@@ -25,15 +25,19 @@
 #include <unordered_map>
 #include <vector>
 #include <random>
-#include "int_index.hpp"
+#include "map_index.hpp"
 namespace ss {
 
     using namespace std;
 
     template<class DataType>
-    class E2LSHIndex : public IntIndex<DataType> {
+    class E2LSHIndex : public MapIndex<DataType, vector<int > > {
+
+    protected:
+        DataType _r;
+        
     public:
-        explicit E2LSHIndex(const parameter& para) : IntIndex<DataType >(para) {}
+        explicit E2LSHIndex(const parameter& para) : MapIndex<DataType, vector<int > >(para), _r(para.r) {}
 
         void Train(const lshbox::Matrix<DataType> &) override {
 
@@ -49,6 +53,16 @@ namespace ss {
             this->_r = this->_para.r;
         }
 
+    protected:
+
+        vector<int > Quantize(const DataType *data) override {
+            vector<int > value(this->_para.dim, 0);
+            for (int i=0; i<this->_para.num_bit; i++) {
+                DataType quantization = ss::InnerProduct(data, this->_projectors[i].data(), this->_para.dim) ;
+                value[i] = std::ceil(quantization / _r);
+            }
+            return value;
+        }
     };
 
 }

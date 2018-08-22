@@ -19,41 +19,31 @@
 /// @author  Xinyan DAI
 /// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
+#include <iostream>
 
-#pragma once
+#include "include/parameters.hpp"
+#include "include/matrix.h"
+#include "include/metric.h"
 
-#include <unordered_map>
-#include <vector>
+#include "include/index/pq.hpp"
+#include "include/query/imi_prober.hpp"
 
-#include "map_index.hpp"
-#include "../utils/hashers.hpp"
+#include "executor.hpp"
 
-namespace ss {
 
-    using namespace std;
+using namespace std;
+using namespace ss;
+using namespace lshbox;
 
-    template<class DataType>
-    class IntIndex : public MapIndex<DataType, vector<int > > {
 
-        typedef vector<int> KeyType;
+int main(int argc, char** argv) {
+    using DataType = float;
 
-    protected:
-        DataType _r;
-    public:
-        explicit IntIndex(const parameter& para) : MapIndex<DataType, KeyType >(para), _r(para.r){}
+    using IndexType =  ss::PQIndex<DataType >;
+    using QueryType =  ss::IMIProber<DataType >;
 
-        virtual void Train(const lshbox::Matrix<DataType> &) = 0;
-
-    protected:
-
-        KeyType Quantize(const DataType *data) override {
-            KeyType value(this->_para.dim, 0);
-            for (int i=0; i<this->_para.num_bit; i++) {
-                DataType quantization = ss::InnerProduct(data, this->_projectors[i].data(), this->_para.dim) ;
-                value[i] = std::ceil(quantization / _r);
-            }
-            return value;
-        }
-
-    };
+    parameter para;
+    LoadOptions(argc, argv, para);
+    SearchIterative<DataType, IndexType, QueryType>(para, L2_DIST);
 }
+

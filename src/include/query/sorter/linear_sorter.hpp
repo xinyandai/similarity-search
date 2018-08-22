@@ -52,7 +52,7 @@ namespace ss {
             std::sort(
                     _sorted_clusters.begin(),
                     _sorted_clusters.end(),
-                    [](const pair<float, unsigned>& a, const pair<float, unsigned>& b) {
+                    [](const pair<float, int >& a, const pair<float, int > & b) {
                         if (a.first != b.first)
                             return a.first < b.first;
                         else

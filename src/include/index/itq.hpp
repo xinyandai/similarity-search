@@ -32,18 +32,18 @@
 #include <functional>
 #include <boost/progress.hpp>
 
-#include "bit_index.hpp"
+#include "map_index.hpp"
 
 namespace ss {
 
     template<typename DataType>
-    class ITQIndex: public BitIndex<DataType> {
+    class ITQIndex: public MapIndex<DataType, uint64_t > {
 
         using KeyType = uint64_t;
 
     public:
 
-        explicit ITQIndex(const parameter & para): BitIndex<DataType >(para) {}
+        explicit ITQIndex(const parameter & para):  MapIndex<DataType, uint64_t >(para) {}
 
         ~ITQIndex() {}
 

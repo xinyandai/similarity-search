@@ -25,21 +25,20 @@
 #include <unordered_map>
 #include <vector>
 #include <random>
-#include "bit_index.hpp"
+#include "map_index.hpp"
 
 namespace ss {
 
     using namespace std;
 
     template<class DataType>
-    class SRPIndex : public BitIndex<DataType> {
+    class SRPIndex : public MapIndex<DataType, uint64_t > {
 
     public:
-        explicit SRPIndex(parameter& para) : BitIndex<DataType >(para) {}
+        explicit SRPIndex(const parameter& para) : MapIndex<DataType, uint64_t >(para) {}
 
         void Train(const lshbox::Matrix<DataType> &data) override {
 
-//            this->InitializeMeans(data);
 
             std::default_random_engine generator;
             std::normal_distribution<DataType > distribution(0.0, 1.0);
@@ -49,6 +48,18 @@ namespace ss {
                     this->_projectors[i][j] = distribution(generator);
                 }
             }
+        }
+
+    protected:
+
+        uint64_t Quantize(const DataType *data) override {
+            uint64_t value = 0;
+            for (int i=0; i<this->_para.num_bit; i++) {
+                DataType quantization = ss::InnerProduct(data,  this->_projectors[i].data(), this->_para.dim) ;
+                value <<= 1;
+                value |= (quantization>0) ? 1 :0;
+            }
+            return value;
         }
 
     };

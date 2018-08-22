@@ -19,42 +19,51 @@
 /// @author  Xinyan DAI
 /// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
-
 #pragma once
+#include <utility>
 
-#include <unordered_map>
-#include <vector>
+using namespace std;
 
-#include "map_index.hpp"
+template<typename DataT, typename DistType=float>
+class Distance {
+protected:
+    DistType    _dist;
+    DataT       _data;
 
-#include "../utils/hashers.hpp"
+public:
+    Distance(DistType dist, const DataT& data): _dist(dist), _data(data) {}
 
-namespace ss {
+    Distance(const pair<DistType, DataT>& p): _dist(p.first), _data(p.second) {}
 
-    using namespace std;
 
-    template<class DataType>
-    class BitIndex : public MapIndex<DataType, uint64_t > {
+    DistType dist() const {
+        return _dist;
+    }
 
-        using KeyType = uint64_t;
-    protected:
-        DataType quantizor = 0;
-    public:
-        explicit BitIndex(const parameter& para) : MapIndex<DataType, KeyType >(para){}
+    const DataT& data() const {
+        return _data;
+    }
+};
 
-        virtual void Train(const lshbox::Matrix<DataType> &) = 0;
+// min heap element
+template<typename DataT, typename DistType=float>
+class MinHeapElement : public Distance<DataT> {
+public:
+    MinHeapElement(DistType dist, const DataT& data) : Distance<DataT>(dist, data) {}
 
-    protected:
+    bool operator<(const MinHeapElement& other) const  {
+        return this->_dist > other._dist;
+    }
+};
 
-        KeyType Quantize(const DataType *data) override {
-            KeyType value = 0;
-            for (int i=0; i<this->_para.num_bit; i++) {
-                DataType quantization = ss::DiffProduct(data, this->_means.data(), this->_projectors[i].data(),
-                                                        this->_para.dim) ;
-                value <<= 1;
-                value |= (quantization>quantizor) ? 1 :0;
-            }
-            return value;
-        }
-    };
-}
+/// max heap element
+template<typename DataT, typename DistType=float>
+class MaxHeapElement : public Distance<DataT, DistType> {
+public:
+    MaxHeapElement(DistType dist, const DataT& data) : Distance<DataT>(dist, data) {}
+
+    bool operator<(const MaxHeapElement& other) const  {
+        return this->_dist < other._dist;
+    }
+};
+

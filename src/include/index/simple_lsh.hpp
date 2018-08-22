@@ -28,7 +28,7 @@
 
 #include "../utils/calculator.hpp"
 
-#include "bit_index.hpp"
+#include "../index.hpp"
 #include "srp.hpp"
 
 namespace ss {

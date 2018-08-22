@@ -31,7 +31,7 @@
 
 #include "../utils/calculator.hpp"
 
-#include "bit_index.hpp"
+#include "map_index.hpp"
 #include "srp.hpp"
 
 namespace ss {
@@ -39,21 +39,21 @@ namespace ss {
     using namespace std;
 
     template<class DataType, class KeyType=uint64_t, class HashingIndexType=SRPIndex<DataType > >
-    class NormRangeIndex : public BitIndex<DataType > {
+    class NormRangeIndex : public MapIndex<DataType, uint64_t > {
     protected:
-        BitIndex<DataType >*     _index;
-        const int                _num_sub_data_set;
-        const int                _bit_sub_data_set;
-        std::vector<DataType>    _norms;
-        std::vector<DataType>    _percentiles;
-        vector<DataType >        _transformed_data; /// TODO(Xinyan ): unsafe when use multi thread. (thread_local)
+        MapIndex<DataType, uint64_t > * _index;
+        const int                       _num_sub_data_set;
+        const int                       _bit_sub_data_set;
+        std::vector<DataType>           _norms;
+        std::vector<DataType>           _percentiles;
+        vector<DataType >               _transformed_data; /// TODO(Xinyan ): unsafe when use multi thread.
     public:
         ~NormRangeIndex() { 
             delete _index; 
         }
 
-        explicit NormRangeIndex(parameter& para) :
-                BitIndex<DataType >(para),
+        explicit NormRangeIndex(const parameter& para) :
+                MapIndex<DataType, uint64_t >(para),
                 _index(new HashingIndexType(para)),
                 _transformed_data(para.dim + 1),
                 _num_sub_data_set(para.num_sub_data_set),
@@ -138,6 +138,9 @@ namespace ss {
         }
 
     protected:
+
+        KeyType Quantize(const DataType *data) override {std::cerr << "Should never be called." << std::endl; };
+
         void InitializePercentile() {
             std::vector<DataType > norms = _norms;
             std::sort(norms.begin(), norms.end());

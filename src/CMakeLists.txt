@@ -27,6 +27,7 @@ SET(EXAMPLES
         norm_range
         simple_lsh
         kmeans
+        pq
 )
 
 FOREACH(EXAMPLE ${EXAMPLES} )

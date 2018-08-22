@@ -68,7 +68,7 @@ namespace ss {
             while(GetNumItemsProbed() < num_items && NextBucketExisted()) {
 
                 const vector<int>& bucket = NextBucket();
-                assert(bucket.size() > 0);
+//                assert(bucket.size() > 0);
 
                 for(int i=0; i<bucket.size(); i++)
                     // _scanner.operator() do three things:

@@ -26,7 +26,7 @@
 
 #include "../parameters.hpp"
 #include "../query.hpp"
-#include "../index/int_index.hpp"
+#include "../index/map_index.hpp"
 #include "../utils/calculator.hpp"
 
 namespace ss {
@@ -47,11 +47,11 @@ namespace ss {
         ~IntRanker() { if(_sorter) delete _sorter; }
 
         explicit IntRanker(
-                IntIndex<DataType > *        index,
-                DataType *                   query,
-                lshbox::Metric<DataType > &  metric,
-                const AccessorType &         accessor,
-                const parameter &            para)
+                MapIndex<DataType, vector<int> > * index,
+                DataType *                         query,
+                lshbox::Metric<DataType > &        metric,
+                const AccessorType &               accessor,
+                const parameter &                  para)
             :  
             Query<DataType >(index, query, metric, accessor, para), _index_map(index->getIndexMap()) {
             

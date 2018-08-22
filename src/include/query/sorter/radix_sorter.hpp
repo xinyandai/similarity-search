@@ -25,7 +25,6 @@
 #include <bitset>
 
 #include "../../query.hpp"
-#include "../../index/bit_index.hpp"
 #include "../../utils/hashers.hpp"
 
 namespace ss {

@@ -55,6 +55,7 @@ void LoadOptions(int argc, char **argv, parameter &para) {
         ("num_sub_data_set", po::value<int   >(&para.num_sub_data_set)->default_value(-1), "number of sub data set")
         ("r,r",              po::value<float >(&para.r)->default_value(0.8),               "float 'w' in e2lsh")
         ("kmeans_centers",   po::value<int   >(&para.kmeans_centers)->default_value(50),   "number of centers")
+        ("num_codebook",     po::value<int   >(&para.num_codebook)->default_value(2),      "number of codebook")
         ("iteration,i",      po::value<int   >(&para.iteration)->default_value(10),        "training iterations")
 
         ("train_data,t",     po::value<string >(&para.train_data),                         "data for training")

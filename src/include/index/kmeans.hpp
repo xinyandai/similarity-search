@@ -27,7 +27,7 @@
 #include <unordered_map>
 #include <boost/progress.hpp>
 
-#include "int_index.hpp"
+#include "../index.hpp"
 
 namespace ss {
 
@@ -48,51 +48,82 @@ namespace ss {
         const vector<vector<DataType > > & get_centers() const { return _centers; }
         const vector<vector<int > >      & get_points()  const { return _points; }
 
+
         void Train(const lshbox::Matrix<DataType > & data) override {
+            iterate(lshbox::Visitor<DataType >(data, 0, data.getDim()));
+        }
+
+
+        void Add(const lshbox::Matrix<DataType > & data) override {
+            Assign(lshbox::Visitor<DataType >(data, 0, data.getDim()));
+        }
+
+
+        void iterate(const lshbox::Visitor<DataType> & data) {
 
             for(int i=0; i<_centers.size(); i++) {
                 _centers[i] = vector<DataType >(data[i], data[i]+data.getDim());
             }
-        }
 
-        void Add(const lshbox::Matrix<DataType > & data) override {
             /// TODO(XINYAN) : move vector operation to calculator
-            boost::progress_display progress(this->_para.iteration * data.getSize());
-            for (int iter = 0; iter < this->_para.iteration; ++iter) {
-                // Assignment
-                for (int i=0; i<data.getSize(); ++i && ++progress) {
+            boost::progress_display progress(this->_para.iteration);
+            for (int iter = 0; iter < this->_para.iteration; ++iter, ++progress) {
 
-                    DataType min_distance = ss::EuclidDistance(data[i], _centers[0].data(), data.getDim());
-                    int nearest_center = 0;
-                    for (int c = 1; c < _centers.size(); c++) {
-                        DataType distance = ss::EuclidDistance(data[i], _centers[c].data(), data.getDim());
-                        if (distance < min_distance) {
-                            min_distance = distance;
-                            nearest_center = c;
-                        }
-                    }
-
-                    _points[nearest_center].push_back(i);
-                }
-
-                // UpdateCenter
-                for (int c = 0; c < _centers.size(); ++c) {
-
-                    vector<DataType > sum(data.getDim(), 0.0f);
-
-                    for (int p = 0; p < _points[c].size(); ++p) {
-                        for (int d = 0; d < data.getDim(); ++d) {
-                            sum[d] += data[_points[c][p]][d];
-                        }
-                    }
-
-                    for (int d = 0; d < data.getDim(); ++d) {
-                        _centers[c][d] = sum[d] / _points[c].size();
-                    }
+                /// Assignment
+                Assign(data);
+                /// UpdateCenter
+                Update(data);
+                /// clear points in each centers
+                for (int c = 0; c<_points.size(); c++) {
+                    _points[c].clear();
                 }
             }
         }
 
+
+        void Update(const lshbox::Visitor<DataType> & data) {
+            for (int c = 0; c < _centers.size(); ++c) {
+
+                vector<DataType > sum(data.getDim(), 0.0f);
+                for (int p = 0; p < _points[c].size(); ++p) {
+
+                    for (int d = 0; d < data.getDim(); ++d) {
+                        sum[d] += data[_points[c][p]][d];
+                    }
+                }
+
+                for (int d = 0; d < data.getDim(); ++d) {
+                    _centers[c][d] = sum[d] / _points[c].size();
+                }
+            }
+        }
+
+
+        void Assign(const lshbox::Visitor<DataType> & data) {
+            for (int i=0; i<data.getSize(); ++i) {
+
+                _points[NearestCenter(data[i], data.getDim())].push_back(i);
+            }
+        }
+
+
+        int NearestCenter(const DataType * vector, int dimension) {
+            DataType min_distance = ss::EuclidDistance(vector, _centers[0].data(), dimension);
+            int nearest_center = 0;
+            for (int c = 1; c < _centers.size(); c++) {
+                DataType distance = Distance(vector, dimension, c);
+                if (distance < min_distance) {
+                    min_distance = distance;
+                    nearest_center = c;
+                }
+            }
+            return nearest_center;
+        }
+
+
+        inline DataType Distance(const DataType * vector, int dimension, int center) {
+            return ss::EuclidDistance(vector, _centers[center].data(), dimension);
+        }
     };
 
 }

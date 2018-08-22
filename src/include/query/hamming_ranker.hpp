@@ -29,7 +29,7 @@
 
 #include "../parameters.hpp"
 #include "../query.hpp"
-#include "../index/bit_index.hpp"
+#include "../index/map_index.hpp"
 
 namespace ss {
 

@@ -1,9 +1,10 @@
+#!/usr/bin/env bash
 #rm -rf build/
 mkdir build/
 cd build/
 # cmake .. -DCMAKE_BUILD_TYPE=Debug
 cmake .. -DCMAKE_BUILD_TYPE=Release
-make
+make e2lsh
 data_dir="../data"
 data_set="audio"
 metric="euclid"
