@@ -50,23 +50,25 @@ namespace ss {
                 _sorted_bucket.emplace_back(std::make_pair(distance, it->first ) );
             }
 
-            std::sort(
-                _sorted_bucket.begin(), 
-                _sorted_bucket.end(), 
-                [](const pair<float, unsigned>& a, const pair<float, unsigned>& b) {
-                    if (a.first != b.first)
-                        return a.first < b.first;
-                    else
-                        return a.second < b.second;
-                });
+            ss::SortPairByFirst(_sorted_bucket);
         }
+
+        explicit BucketSorter( const vector< pair<DataType, KeyType > > & buckets, bool sorted= false)
+                : _sorted_bucket(buckets) {
+            if (!sorted) {
+                ss::SortPairByFirst(_sorted_bucket);
+            }
+        }
+
 
         virtual KeyType NextBucket() {
             return _sorted_bucket[index++].second;
         }
 
+
         virtual bool NextBucketExisted() {
             return index < _sorted_bucket.size();
         }
+
     };
 }

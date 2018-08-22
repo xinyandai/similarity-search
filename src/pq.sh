@@ -9,7 +9,7 @@ data_dir="../../data"
 data_set="audio"
 metric="euclid"
 topk=20
-gdb --args \
+# gdb --args \
 ./pq \
     -t ${data_dir}/${data_set}/${data_set}_base.fvecs \
     -b ${data_dir}/${data_set}/${data_set}_base.fvecs \

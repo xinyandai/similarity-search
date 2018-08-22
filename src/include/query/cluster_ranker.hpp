@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "sorter/linear_sorter.hpp"
+#include "sorter/bucket_sorter.hpp"
 
 #include "../parameters.hpp"
 #include "../query.hpp"
@@ -42,7 +42,7 @@ namespace ss {
     protected:
         const vector<vector<DataType > > &   _centers;
         const vector<vector<int > >      &   _points;;
-        LinearSorter<DataType> *             _sorter;
+        BucketSorter<DataType, int> *        _sorter;
 
     public:
         ~ClusterRanker() { if(_sorter) delete _sorter; }
@@ -58,10 +58,7 @@ namespace ss {
                 _centers(index->get_centers()),
                 _points(index->get_points()) {
 
-            auto distor = [query, this, &para] (int center) {
-                return ss::EuclidDistance(query, this->_centers[center].data(), para.dim);
-            };
-            _sorter = new LinearSorter<DataType>(_centers.size(), distor);
+            _sorter = new BucketSorter<DataType, int >(index->ClusterDistance(query, para.dim));
         }
 
         const vector<int >& NextBucket() override { return _points[_sorter->NextBucket()]; }

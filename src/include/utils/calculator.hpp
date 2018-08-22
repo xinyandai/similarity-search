@@ -31,6 +31,32 @@ namespace ss {
 
     using namespace std;
 
+    template <typename FirstType, typename SencondType>
+    void SortPairByFirst(vector<std::pair<FirstType, SencondType> > & _sorted_bucket) {
+        std::sort(
+                _sorted_bucket.begin(),
+                _sorted_bucket.end(),
+                [](const pair<FirstType, SencondType >& a, const pair<FirstType, SencondType>& b) {
+                    if (a.first != b.first)
+                        return a.first < b.first;
+                    else
+                        return a.second < b.second;
+                });
+    }
+
+    template <typename FirstType, typename SencondType>
+    void SortPairBySecond(vector<std::pair<FirstType, SencondType> > & _sorted_bucket) {
+        std::sort(
+                _sorted_bucket.begin(),
+                _sorted_bucket.end(),
+                [](const pair<FirstType, SencondType >& a, const pair<FirstType, SencondType>& b) {
+                    if (a.second != b.second)
+                        return a.second < b.second;
+                    else
+                        return a.first < b.first;
+                });
+    }
+
     template <class DataType >
     DataType inline EuclidDistance(const DataType *a, const DataType *b, int dim) {
 

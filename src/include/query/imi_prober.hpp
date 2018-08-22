@@ -57,6 +57,10 @@ namespace ss {
                 _dist_to_centers(index->DistToCenters(query)),
                 _hash_map(index->hash_map()) {
 
+            for (int i = 0; i < _dist_to_centers.size(); ++i) {
+                ss::SortPairByFirst(_dist_to_centers[i]);
+            }
+
             auto distor = [this, &para](vector<int > coord) {
                 DataType distance = 0.0f;
                 for (int code_book = 0; code_book < para.num_codebook; ++code_book) {

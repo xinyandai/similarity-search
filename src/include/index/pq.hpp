@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <utility>
 #include <vector>
 #include <random>
 #include <unordered_map>
@@ -66,21 +67,23 @@ namespace ss {
         void Train(const lshbox::Matrix<DataType > & data) override {
 
             for (int i=0; i<_K_means.size(); ++i) {
+                /// train each code-book,
+                /// use Visitor to represent data in each code-book
                 _K_means[i].iterate(lshbox::Visitor<DataType >(data, _offsets[i], _dimensions[i]));
             }
         }
 
         void Add(const lshbox::Matrix<DataType > & data) override {
 
-            // find the nearest center
             for (int i = 0; i < data.getSize(); ++i) {
-                
+                /// find each point's nearest center
                 vector<int > cluster_id(this->_para.num_codebook, 0);
+                /// find each point's nearest center in each code-book
                 for (int code_book = 0; code_book < this->_para.num_codebook; ++code_book) {
-                    cluster_id[code_book] = _K_means[code_book].NearestCenter(
-                            data[i] + _offsets[code_book], _dimensions[code_book]);
+                    cluster_id[code_book] =
+                            _K_means[code_book].NearestCenter(data[i] + _offsets[code_book], _dimensions[code_book]);
                 }
-                
+                /// add into centers
                 _hash_map[cluster_id].push_back(i);
             }
         }
@@ -91,36 +94,19 @@ namespace ss {
         }
 
 
-        vector<vector<std::pair<DataType, int>  > > DistToCenters(DataType* queryPoint) {
-
-            vector<vector<std::pair<DataType, int>   > > dist_to_centers(
-                    this->_para.num_codebook,
-                    vector<std::pair<DataType, int>  >(this->_para.kmeans_centers)
-            );
-
+        /**
+         * dist_to_centers[i][j] means the distance between query and j'th center in i'th code-book.
+         * @return dist_to_centers
+         */
+        vector<vector<std::pair<DataType, int>  > > DistToCenters(DataType* query) {
+            vector<vector<std::pair<DataType, int>   > > dist_to_centers(this->_para.num_codebook);
             for (int code_book = 0; code_book < this->_para.num_codebook ; ++code_book) {
-
-                vector<pair<float, int> > & dists = dist_to_centers[code_book];
-                for (int center = 0; center < this->_para.kmeans_centers; ++center) {
-
-                    DataType distance = _K_means[code_book].Distance(
-                            queryPoint + _offsets[code_book], _dimensions[code_book], center);
-                    dists[center] = std::make_pair(distance, center);
-                }
-                std::sort(
-                        dists.begin(),
-                        dists.end(),
-                        [](const pair<float, int>& a, const pair<float, int>& b) {
-                            if (a.first != b.first)
-                                return a.first < b.first;
-                            else
-                                return a.second < b.second;
-                        });
+                dist_to_centers[code_book] =
+                        _K_means[code_book].ClusterDistance(query + _offsets[code_book], _dimensions[code_book]);
             }
 
             return dist_to_centers;
         }
-
 
     };
 
