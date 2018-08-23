@@ -57,7 +57,7 @@ namespace ss {
                 _index(new HashingIndexType(para)),
                 _transformed_data(para.dim + 1),
                 _num_sub_data_set(para.num_sub_data_set),
-                _bit_sub_data_set((int)std::ceil(std::log2(_num_sub_data_set))) {}
+                _bit_sub_data_set(static_cast<int>(std::ceil(std::log2(_num_sub_data_set)))) {}
 
         void Train(const lshbox::Matrix<DataType> &data) override {
             _norms = data.calNorms(); /// TODO(Xinyan: ): should be improved

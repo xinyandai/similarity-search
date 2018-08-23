@@ -33,21 +33,29 @@ You should predefine  ${train_data_file} ${base_data_file} ${query_data_file} ${
   - map based index
       - bit index
         - sign random projection
-        - PCAH,ITQ,...(not develop yet)
+        - ITQ
+        - PCAH(to be developed)
       - int index
         - e2lsh
-        - KMeans,PQ,OPQ...(not develop yet)
-  - graph based index(not develop yet)
-  - others
-    - norm-range(for max inner product search)
+      - cluster index
+        - k-means
+        - PQ
+        - OPQ(to be developed)
+  - graph based index(to be developed)
+  - transform based method
+    - simple-LSH(for maximum inner product search)
+    - norm-range(for maximum inner product search)
+    - l2-ALSH(to be developed)
+
 #  query method
-  - int rank
-  - hamming rank
-  - others
-    - norm-range(for norm-range index only)
+  - int ranking(for int index)
+  - hamming ranking(for bit index)
+  - cluster ranker(for cluster based method, k-means only)
+  - inverted multi index(for pq only)
+  - norm-range(for norm-range index only)
 
 # style check
 
     pip install cpplint
-    cpplint --recursive --filter=-whitespace,-whitespace/line_length,-build/namespaces,-runtime/references,-eadability/todo,-readability/todo,-build/header_guard,-readability/namespace,-build/include_what_you_use,-readability/casting,-readability/braces,-runtime/indentation_namespace,-build/include_subdir  src/include/*
+    cpplint --recursive --filter=-whitespace,-build/namespaces,-runtime/references,-readability/namespace,-build/include_what_you_use,-runtime/indentation_namespace,-build/include_subdir  src/include/*
 

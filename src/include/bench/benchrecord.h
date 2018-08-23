@@ -94,12 +94,12 @@ private:
 
     float precision(unsigned qId, const vector<pair<float, unsigned>>& givenKNN, unsigned numProbed) const {
         unsigned numMatched = numRetrieved(qId, this->extractIvecs(givenKNN));
-        return (float) numMatched / numProbed;
+        return static_cast<float>(numMatched / numProbed);
     }
 
     float recall(unsigned qId, const vector<pair<float, unsigned>>& givenKNN) const {
         unsigned numMatched = numRetrieved(qId, this->extractIvecs(givenKNN));
-        return numMatched / float(this->knn.size());
+        return numMatched / static_cast<float>(this->knn.size());
     }
 
     unsigned numRetrieved(unsigned qId, const vector<unsigned>& ivecs) const {

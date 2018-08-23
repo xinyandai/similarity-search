@@ -39,11 +39,7 @@ using std::pair;
 using std::vector;
 namespace lshbox
 {
-/**
- * Max Heap.
- *
- * This is a max heap for TopK.
- */
+
 template <typename Comparable>
 class MaxHeap
 {

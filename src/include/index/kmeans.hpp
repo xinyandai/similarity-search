@@ -147,7 +147,7 @@ namespace ss {
             }
 
             return dist_centers;
-        };
+        }
 
         inline DataType Distance(const DataType * vector, int dimension, int center) {
             return ss::EuclidDistance(vector, _centers[center].data(), dimension);

@@ -135,12 +135,12 @@ public:
 
     float avg_items(const  vector<unsigned>& numItemProbed) {
         if (numItemProbed.size() == 0) return 0;
-    uint64_t sum = 0;
-    for (const unsigned& v : numItemProbed) {
-        sum += v;
-    }
-    double result = (double) sum / numItemProbed.size();
-    return ((float)result);
+        uint64_t sum = 0;
+        for (const unsigned& v : numItemProbed) {
+            sum += v;
+        }
+        double result = sum / static_cast<double>(numItemProbed.size());
+        return  static_cast<float>(result);
     }
 
     const BenchRecord& getRecord(unsigned qId) const {

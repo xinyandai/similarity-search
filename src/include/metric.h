@@ -82,7 +82,7 @@ public:
         {
             for (unsigned i = 0; i != dim_; ++i)
             {
-                dist_ += float(std::abs(vec1[i] * 1.0 - vec2[i]));
+                dist_ +=  static_cast<float>( std::abs(vec1[i] * 1.0 - vec2[i]));
             }
             return dist_;
         }

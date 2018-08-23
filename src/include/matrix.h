@@ -27,13 +27,15 @@
  * @brief Dataset management class.
  */
 #pragma once
+
+#include <assert.h>
+
 #include <fstream>
 #include <vector>
 #include <cmath>
 #include <iostream>
 #include <cstring>
 
-#include <assert.h>
 #include "utils/calculator.hpp"
 
 namespace lshbox {
@@ -60,7 +62,7 @@ namespace lshbox {
 
             _dimension = _dim;
             _size = _N;
-            _data = (T*)std::realloc(_data, _dimension * _size * sizeof(T));
+            _data = reinterpret_cast<T*>(std::realloc(_data, _dimension * _size * sizeof(T)));
         }
 
         const T *operator [] (int i) const {
@@ -99,19 +101,19 @@ namespace lshbox {
             assert(fileSize != 0);
 
             int dimension;
-            fin.read((char*)&dimension, sizeof(int));
+            fin.read(reinterpret_cast<char*>(&dimension), sizeof(int));
             unsigned bytesPerRecord = dimension * sizeof(DATATYPE) + 4;
             assert(fileSize % bytesPerRecord == 0);
             uint64_t cardinality = fileSize / bytesPerRecord;
 
             data.reset(dimension, cardinality);
-            fin.read((char *)(data[0]), sizeof(float) * dimension);
+            fin.read(reinterpret_cast<char*>(data[0]), sizeof(float) * dimension);
 
             int dim;
             for (int i = 1; i < cardinality; ++i) {
-                fin.read((char*)&dim, sizeof(int));
+                fin.read(reinterpret_cast<char*>(&dim), sizeof(int));
                 assert(dim == dimension);
-                fin.read((char *)(data[i]), sizeof(float) * dimension);
+                fin.read(reinterpret_cast<char*>(data[i]), sizeof(float) * dimension);
             }
             fin.close();
         }

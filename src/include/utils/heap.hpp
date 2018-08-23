@@ -33,7 +33,7 @@ protected:
 public:
     Distance(DistType dist, const DataT& data): _dist(dist), _data(data) {}
 
-    Distance(const pair<DistType, DataT>& p): _dist(p.first), _data(p.second) {}
+    explicit Distance(const pair<DistType, DataT>& p): _dist(p.first), _data(p.second) {}
 
 
     DistType dist() const {
