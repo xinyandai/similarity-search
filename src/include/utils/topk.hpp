@@ -27,52 +27,69 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
+#include <algorithm>
+#include <utility>
+#include <unordered_set>
 
-#include "../../query.hpp"
-#include "../../utils/hashers.hpp"
+#include "matrix.hpp"
+#include "metric.hpp"
 
+#include "utils/heap.hpp"
+
+using std::unordered_set;
+using std::pair;
+using std::vector;
 namespace ss {
 
-    template <class DataType, class KeyType >
-    class RadixSorter {
+    template <typename DataType>
+    class Scanner {
 
-    protected:
-        vector<vector<KeyType > >  _dist_bucket;
-        int                        _i;
-        int                        _j;
+    private:
+        Metric<DataType>            _metric;
+        Heap<int, float>            _heap;
+        int                         _K;
+        int                         _count;
+        const Matrix<DataType > &   _data;
+        const DataType *            _query;
 
     public:
-        explicit RadixSorter(
-                const unordered_map<KeyType, vector<int>, SSHasher<KeyType > > &  map,
-                const std::function<int (const KeyType&) > &                      distor,
-                int                                                               maximum_distance)
+        Scanner(const Matrix<DataType> & data,
+                const Metric<DataType> & metric,
+                const DataType *         query,
+                int                      K)
                 :
-                _dist_bucket(maximum_distance+1, vector<KeyType >()),
-                _i(0),
-                _j(0) {
-            
-            for(auto it = map.begin(); it != map.end(); it++) {
-            
-                int hamming_dist = distor(it->first);
-                assert(hamming_dist>=0 && hamming_dist<=maximum_distance);
-                _dist_bucket[hamming_dist].push_back(it->first);
-                assert(it->second.size() > 0);
-            }
+                _data(data), _metric(metric), _K(K), _count(0), _query(query), _heap(K) {}
+
+
+        int count() const {
+            return _count;
         }
 
 
-        virtual KeyType& NextBucket() {
-            while(_j == _dist_bucket[_i].size()) {
-                _j = 0;
-                _i ++;
-            }
-            return _dist_bucket[_i][_j++];
+        int getK() {
+            return _K;
         }
 
-        virtual bool NextBucketExisted() {
-            return _i < _dist_bucket.size();
+
+        vector<pair<float, int > > TopKPairs() const {
+            return _heap.TopKPairs();
         }
-    
+
+        /**
+         * Update the current query by scanning key, this is normally invoked by the LSH
+         * index structure.
+         */
+        void operator () (int id) {
+            ++_count;
+            _heap.Insert(CalDist(id), id);
+        }
+
+
+        float CalDist(int id) const {
+            return _metric.dist(_query, _data[id]);
+        }
+
     };
 
 } // namespace ss

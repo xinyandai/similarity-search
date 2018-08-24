@@ -51,4 +51,5 @@ namespace ss {
     private:
         double time;
     };
-}
+
+}  // namespace ss

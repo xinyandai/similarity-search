@@ -4,7 +4,7 @@ mkdir build/
 cd build/
 cmake .. -DCMAKE_BUILD_TYPE=Debug
 # cmake .. -DCMAKE_BUILD_TYPE=Release
-make norm_range
+make norm_range -j16
 data_dir="../../data"
 data_set="netflix"
 metric="product"

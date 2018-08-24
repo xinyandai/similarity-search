@@ -1,24 +1,30 @@
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 /// Copyright 2018-present Xinyan DAI<xinyan.dai@outlook.com>
 ///
-/// permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-/// documentation files (the "Software"), to deal in the Software without restriction, including without limitation
-/// the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
-/// and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+/// permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to
+/// deal in the Software without restriction, including without limitation the
+/// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+/// sell copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
 ///
-/// The above copyright notice and this permission notice shall be included in all copies or substantial portions of
-/// the Software.
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions ofthe Software.
 ///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-/// THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-/// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-/// SOFTWARE.
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+/// IN THE SOFTWARE.
 
 /// @version 0.1
 /// @author  Xinyan DAI
 /// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
+
+
 
 #pragma once
 
@@ -32,7 +38,7 @@
 
 namespace ss {
 
-    using namespace std;
+    using std::vector;
 
     template<class DataType>
     class KMeansIndex : public Index<DataType> {
@@ -53,13 +59,13 @@ namespace ss {
         const vector<vector<int > >      & get_points()  const { return _points; }
 
 
-        void Train(const lshbox::Matrix<DataType > & data) override {
-            iterate(lshbox::Visitor<DataType >(data, 0, data.getDim()));
+        void Train(const Matrix<DataType > & data) override {
+            iterate(Visitor<DataType >(data, 0, data.getDim()));
         }
 
 
-        void Add(const lshbox::Matrix<DataType > & data) override {
-            Assign(lshbox::Visitor<DataType >(data, 0, data.getDim()));
+        void Add(const Matrix<DataType > & data) override {
+            Assign(Visitor<DataType >(data, 0, data.getDim()));
         }
 
 
@@ -67,7 +73,7 @@ namespace ss {
          * iteratively update centers and re-assign points
          * @param data
          */
-        void iterate(const lshbox::Visitor<DataType> & data) {
+        void iterate(const Visitor<DataType> & data) {
 
             /// initialize centers
             /// TODO(Xinyan): should be randomly initialize
@@ -92,7 +98,7 @@ namespace ss {
         /**
          * re-calculate center by averaging points' coordinate
          */
-        void Update(const lshbox::Visitor<DataType> & data) {
+        void Update(const Visitor<DataType> & data) {
             for (int c = 0; c < _centers.size(); ++c) {
 
                 vector<DataType > sum(data.getDim(), 0.0f);
@@ -112,7 +118,7 @@ namespace ss {
         /**
          * assign each point in {@link data} to nearest center
          */
-        void Assign(const lshbox::Visitor<DataType> & data) {
+        void Assign(const Visitor<DataType> & data) {
             for (int i=0; i<data.getSize(); ++i) {
 
                 _points[NearestCenter(data[i], data.getDim())].push_back(i);
@@ -155,4 +161,4 @@ namespace ss {
 
     };
 
-}
+} // namespace ss

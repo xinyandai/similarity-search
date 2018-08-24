@@ -1,19 +1,23 @@
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 /// Copyright 2018-present Xinyan DAI<xinyan.dai@outlook.com>
 ///
-/// permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-/// documentation files (the "Software"), to deal in the Software without restriction, including without limitation
-/// the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
-/// and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+/// permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to
+/// deal in the Software without restriction, including without limitation the
+/// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+/// sell copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
 ///
-/// The above copyright notice and this permission notice shall be included in all copies or substantial portions of
-/// the Software.
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions ofthe Software.
 ///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-/// THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-/// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-/// SOFTWARE.
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+/// IN THE SOFTWARE.
 
 /// @version 0.1
 /// @author  Xinyan DAI
@@ -22,20 +26,22 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cmath>
 #include <iostream>
-
-#include "vector"
+#include <vector>
+#include <utility>
 
 namespace ss {
 
-    using namespace std;
+    using std::vector;
+    using std::pair;
 
     template <typename FirstType, typename SencondType>
-    void SortPairByFirst(vector<std::pair<FirstType, SencondType> > & _sorted_bucket) {
+    void SortPairByFirst(vector<std::pair<FirstType, SencondType> > * _sorted_bucket) {
         std::sort(
-                _sorted_bucket.begin(),
-                _sorted_bucket.end(),
+                _sorted_bucket->begin(),
+                _sorted_bucket->end(),
                 [](const pair<FirstType, SencondType >& a, const pair<FirstType, SencondType>& b) {
                     if (a.first != b.first)
                         return a.first < b.first;
@@ -45,10 +51,10 @@ namespace ss {
     }
 
     template <typename FirstType, typename SencondType>
-    void SortPairBySecond(vector<std::pair<FirstType, SencondType> > & _sorted_bucket) {
+    void SortPairBySecond(vector<std::pair<FirstType, SencondType> > * _sorted_bucket) {
         std::sort(
-                _sorted_bucket.begin(),
-                _sorted_bucket.end(),
+                _sorted_bucket->begin(),
+                _sorted_bucket->end(),
                 [](const pair<FirstType, SencondType >& a, const pair<FirstType, SencondType>& b) {
                     if (a.second != b.second)
                         return a.second < b.second;
@@ -159,4 +165,4 @@ namespace ss {
         return count;
     }
 
-}
+} // namespace ss

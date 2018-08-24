@@ -1,44 +1,42 @@
-//////////////////////////////////////////////////////////////////////////////
-/// Copyright (C) 2014 Gefu Tang <tanggefu@gmail.com>. All Rights Reserved.
+////////////////////////////////////////////////////////////////////////////////
+/// Copyright 2018-present Xinyan DAI<xinyan.dai@outlook.com>
 ///
-/// This file is part of LSHBOX.
+/// permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to
+/// deal in the Software without restriction, including without limitation the
+/// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+/// sell copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
 ///
-/// LSHBOX is free software: you can redistribute it and/or modify it under
-/// the terms of the GNU General Public License as published by the Free
-/// Software Foundation, either version 3 of the License, or(at your option)
-/// any later version.
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions ofthe Software.
 ///
-/// LSHBOX is distributed in the hope that it will be useful, but WITHOUT
-/// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-/// FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
-/// more details.
-///
-/// You should have received a copy of the GNU General Public License along
-/// with LSHBOX. If not, see <http://www.gnu.org/licenses/>.
-///
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+/// IN THE SOFTWARE.
+
 /// @version 0.1
-/// @author Gefu Tang & Zhifeng Xiao
-/// @date 2014.6.30
+/// @author  Xinyan DAI
+/// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
 
-/**
- * @file matrix.h
- *
- * @brief Dataset management class.
- */
 #pragma once
 
 #include <assert.h>
 
-#include <fstream>
-#include <vector>
 #include <cmath>
+#include <fstream>
 #include <iostream>
-#include <cstring>
+#include <string>
+#include <vector>
 
 #include "utils/calculator.hpp"
 
-namespace lshbox {
+namespace ss {
 
     template <class T>
     class Matrix {
@@ -53,7 +51,7 @@ namespace lshbox {
             std::free(_data);
         }
         explicit Matrix(const std::string &path): _data(NULL) {
-            loadFvecs((*this), path);
+            loadFvecs(this, path);
         }
         Matrix(const Matrix& M) = delete;
         Matrix& operator=(const Matrix& M)  = delete;
@@ -90,7 +88,10 @@ namespace lshbox {
         }
 
         template<typename DATATYPE>
-        friend void loadFvecs(Matrix<DATATYPE>& data, const std::string& dataFile) {
+        friend void loadFvecs(Matrix<DATATYPE> * data_point, const std::string& dataFile) {
+
+            Matrix<DATATYPE>& data  = *data_point;
+
             std::ifstream fin(dataFile.c_str(), std::ios::binary | std::ios::ate);
             if (!fin) {
                 std::cout << "cannot open file " << dataFile.c_str() << std::endl;
@@ -118,35 +119,6 @@ namespace lshbox {
             fin.close();
         }
 
-
-        class Accessor {
-
-            const Matrix &matrix_;
-            std::vector<bool> flags_;
-        public:
-            typedef unsigned Key;
-            typedef const T *Value;
-            typedef T DATATYPE;
-
-            explicit Accessor(const Matrix &matrix): matrix_(matrix) {
-                flags_.resize(matrix_.getSize());
-            }
-            void reset() {
-                flags_.clear();
-                flags_.resize(matrix_.getSize());
-            }
-            bool mark(unsigned key) {
-                if (flags_[key]) {
-                    return false;
-                }
-                flags_[key] = true;
-                return true;
-            }
-            const T *operator () (unsigned key) const {
-                return matrix_[key];
-            }
-        };
-
     };
 
 
@@ -173,4 +145,5 @@ namespace lshbox {
             return _matrix.getSize();
         }
     };
-}
+
+} // namespace ss

@@ -4,7 +4,7 @@ mkdir build/
 cd build/
 # cmake .. -DCMAKE_BUILD_TYPE=Debug
 cmake .. -DCMAKE_BUILD_TYPE=Release
-make ground_truth
+make ground_truth -j16
 
 topk=20
 numThreads=16

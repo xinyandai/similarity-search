@@ -1,24 +1,29 @@
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 /// Copyright 2018-present Xinyan DAI<xinyan.dai@outlook.com>
 ///
-/// permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-/// documentation files (the "Software"), to deal in the Software without restriction, including without limitation
-/// the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
-/// and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+/// permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to
+/// deal in the Software without restriction, including without limitation the
+/// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+/// sell copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
 ///
-/// The above copyright notice and this permission notice shall be included in all copies or substantial portions of
-/// the Software.
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions ofthe Software.
 ///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-/// THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-/// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-/// SOFTWARE.
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+/// IN THE SOFTWARE.
 
 /// @version 0.1
 /// @author  Xinyan DAI
 /// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 #include <string>
 #include <iostream>
@@ -30,15 +35,14 @@
 #include "include/parameters.hpp"
 #include "include/index.hpp"
 
-#include "include/bench/bencher.h"
-#include "include/bench/benchrecord.h"
+#include "bench/bencher.hpp"
+#include "bench/benchrecord.hpp"
 
-#include "include/matrix.h"
+#include "matrix.hpp"
 #include "include/utils/util.hpp"
 
 using namespace std;
 using namespace ss;
-using namespace lshbox;
 
 
 void LoadOptions(int argc, char **argv, parameter &para) {
@@ -86,9 +90,9 @@ int SearchIterative(parameter &para, int distance_metric) {
 
     cout << "[loading ] loading fvecs data                                    " ;
     time_recorder.restart();
-    lshbox::Matrix<DataType> train_data(para.train_data);
-    lshbox::Matrix<DataType> base_data (para.base_data);
-    lshbox::Matrix<DataType> query_data(para.query_data);
+    Matrix<DataType> train_data(para.train_data);
+    Matrix<DataType> base_data (para.base_data);
+    Matrix<DataType> query_data(para.query_data);
     cout << "using time :" << time_recorder.elapsed() << endl;
 
     para.topK       = truth_bench.getTopK();
@@ -97,6 +101,9 @@ int SearchIterative(parameter &para, int distance_metric) {
     para.query_size = query_data.getSize();
     para.dim        = train_data.getDim() + para.transformed_dim; /// useful when add dimensions for some algorithm
     para.origin_dim = train_data.getDim();
+
+    //// choose the metric
+    Metric<DataType >  metric(train_data.getDim(), distance_metric);
 
     cout << "[training] initial the index." << endl;
     IndexType index(para);
@@ -113,9 +120,6 @@ int SearchIterative(parameter &para, int distance_metric) {
     /// add database items into index, using the information(e.g. hahs function) learned/generated in training stage.
     index.Add(base_data);
     cout << "using time :" << time_recorder.elapsed() << endl;
-
-    typename Matrix<DataType >::Accessor      accessor(base_data);
-    lshbox::Metric<DataType >                 metric(train_data.getDim(), distance_metric);
 
 
     const char * spliter = ", ";
@@ -134,9 +138,9 @@ int SearchIterative(parameter &para, int distance_metric) {
         if ( num_items > para.base_size )
             num_items = para.base_size;
 
-        vector<vector<pair<float, unsigned> > >   current_topK(para.query_size);    //TODO copy should be avoided
-        vector<unsigned>                          item_probed(para.query_size);
-        vector<QueryType * >                      queries(para.query_size);
+        vector<vector<pair<float, int > > >   current_topK(para.query_size);    //TODO copy should be avoided
+        vector<int >                          item_probed(para.query_size);
+        vector<QueryType * >                  queries(para.query_size);
 
         {  /// probing
 
@@ -144,7 +148,7 @@ int SearchIterative(parameter &para, int distance_metric) {
 
             for (int i = 0; i < para.query_size; i++) {
                 /// determine the sequence of probing bucket(except probing by looking up)
-                queries[i] = (new QueryType(&index, query_data[i], metric, accessor, para) );
+                queries[i] = (new QueryType(&index, query_data[i], metric, base_data, para) );
             }
 
             for (int i = 0; i <  para.query_size; i++) {  /// probing

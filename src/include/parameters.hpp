@@ -1,60 +1,63 @@
-//////////////////////////////////////////////////////////////////////////////
-/// Copyright 2018-present      DAI<    .dai@outlook.com>
+////////////////////////////////////////////////////////////////////////////////
+/// Copyright 2018-present Xinyan DAI<xinyan.dai@outlook.com>
 ///
-/// permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-/// documentation files (the "Software"), to deal in the Software without restriction, including without limitation
-/// the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
-/// and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+/// permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to
+/// deal in the Software without restriction, including without limitation the
+/// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+/// sell copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
 ///
-/// The above copyright notice and this permission notice shall be included in all copies or substantial portions of
-/// the Software.
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions ofthe Software.
 ///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-/// THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-/// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-/// SOFTWARE.
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+/// IN THE SOFTWARE.
 
 /// @version 0.1
-/// @author       DAI
-/// @contact     .dai@outlook.com
+/// @author  Xinyan DAI
+/// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-#include <iostream>
-#include <boost/program_options.hpp>
+#include <string>
+
 
 namespace ss{
 
+    struct parameter {
+        std::string train_data;
+        std::string base_data;
+        std::string query_data;
+        std::string ground_truth;
 
-struct parameter {
-    std::string train_data;
-    std::string base_data;
-    std::string query_data;
-    std::string ground_truth;
+        int topK;
+        int num_thread;
+        int dim;
+        int transformed_dim;
+        int origin_dim;
+        int graph_K;
 
-    int topK;
-    int num_thread;
-    int dim;
-    int transformed_dim;
-    int origin_dim;
-    int graph_K;
+        int kmeans_centers;
+        int num_codebook;
 
-    int kmeans_centers;
-    int num_codebook;
+        int num_bit;
+        int num_sub_data_set;
 
-    int num_bit;
-    int num_sub_data_set;
+        int train_size;
+        int query_size;
+        int base_size;
 
-    int train_size;
-    int query_size;
-    int base_size;
+        int iteration; // training iteraions
 
-    int iteration; // training iteraions
+        float r; // h(x) = ceil[(av+b)/r]
 
-    float r; // h(x) = ceil[(av+b)/r]
+    } typedef parameter;
 
-} typedef parameter;
-
-}
+} // namespace ss

@@ -57,5 +57,5 @@ You should predefine  ${train_data_file} ${base_data_file} ${query_data_file} ${
 # style check
 
     pip install cpplint
-    cpplint --recursive --filter=-whitespace,-build/namespaces,-runtime/references,-readability/namespace,-build/include_what_you_use,-runtime/indentation_namespace,-build/include_subdir  src/include/*
+    cpplint --recursive --filter=-whitespace,-runtime/indentation_namespace  src/include/*
 

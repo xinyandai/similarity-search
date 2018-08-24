@@ -4,7 +4,7 @@ mkdir build/
 cd build/
 cmake .. -DCMAKE_BUILD_TYPE=Debug
 # cmake .. -DCMAKE_BUILD_TYPE=Release
-make simple_lsh
+make simple_lsh -j16
 data_dir="../../data"
 data_set="netflix"
 metric="product"

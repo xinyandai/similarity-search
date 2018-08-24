@@ -4,7 +4,7 @@ mkdir build/
 cd build/
 # cmake .. -DCMAKE_BUILD_TYPE=Debug
 cmake .. -DCMAKE_BUILD_TYPE=Release
-make srp
+make srp -j16
 data_dir="../data"
 data_set="audio"
 metric="angular"

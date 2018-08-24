@@ -1,2 +1,6 @@
 build/
 tags
+.idea/
+cmake-build-debug/
+log
+script/

@@ -1,19 +1,23 @@
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 /// Copyright 2018-present Xinyan DAI<xinyan.dai@outlook.com>
 ///
-/// permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-/// documentation files (the "Software"), to deal in the Software without restriction, including without limitation
-/// the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
-/// and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+/// permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to
+/// deal in the Software without restriction, including without limitation the
+/// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+/// sell copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
 ///
-/// The above copyright notice and this permission notice shall be included in all copies or substantial portions of
-/// the Software.
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions ofthe Software.
 ///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-/// THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-/// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-/// SOFTWARE.
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+/// IN THE SOFTWARE.
 
 /// @version 0.1
 /// @author  Xinyan DAI
@@ -23,15 +27,16 @@
 #pragma once
 
 #include <unordered_map>
+#include <utility>
 #include <vector>
-#include <functional>
-#include <algorithm>
 
 #include "../../utils/hashers.hpp"
 
 namespace ss {
 
-    using namespace std;
+    using std::vector;
+    using std::pair;
+    using std::unordered_map;
 
     template<class DataType, class KeyType>
     class BucketSorter {
@@ -50,13 +55,13 @@ namespace ss {
                 _sorted_bucket.emplace_back(std::make_pair(distance, it->first ) );
             }
 
-            ss::SortPairByFirst(_sorted_bucket);
+            ss::SortPairByFirst(&_sorted_bucket);
         }
 
         explicit BucketSorter( const vector< pair<DataType, KeyType > > & buckets, bool sorted= false)
                 : _sorted_bucket(buckets) {
             if (!sorted) {
-                ss::SortPairByFirst(_sorted_bucket);
+                ss::SortPairByFirst(&_sorted_bucket);
             }
         }
 
@@ -71,4 +76,5 @@ namespace ss {
         }
 
     };
-}
+
+} // namespace ss
