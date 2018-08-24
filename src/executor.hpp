@@ -48,6 +48,7 @@ void LoadOptions(int argc, char **argv, parameter &para) {
     opts.add_options()
         ("help,h", "help info")
         ("num_bit,l",        po::value<int   >(&para.num_bit)->default_value(32)  ,        "num of hash bit")
+        ("graph_K",          po::value<int   >(&para.graph_K)->default_value(50)  ,        "number of neighbors")
         // TODO(Xinyan): to support multi thread
         ("num_thread",       po::value<int   >(&para.num_thread)->default_value(1),        "num of thread")
         ("dim,d",            po::value<int   >(&para.dim)->default_value(-1)      ,        "origin dimension of data")
@@ -98,32 +99,24 @@ int SearchIterative(parameter &para, int distance_metric) {
     para.origin_dim = train_data.getDim();
 
     cout << "[training] initial the index." << endl;
-    IndexType * index = new IndexType(para);
+    IndexType index(para);
 
     cout << "[training] training the hash functions or models                 ";
     time_recorder.restart();
     /// train the model, generate random vectors if using LSH,
     /// learn the projection vectors if using learning to hash method.(PCAH, ITQ, SH ...)
-    index->Train(train_data);
+    index.Train(train_data);
     cout << "using time :" << time_recorder.elapsed() << endl;
 
     cout << "[training] put data into index                                   ";
     time_recorder.restart();
     /// add database items into index, using the information(e.g. hahs function) learned/generated in training stage.
-    index->Add(base_data);
+    index.Add(base_data);
     cout << "using time :" << time_recorder.elapsed() << endl;
 
     typename Matrix<DataType >::Accessor      accessor(base_data);
     lshbox::Metric<DataType >                 metric(train_data.getDim(), distance_metric);
-    vector<QueryType * >                      queries;
 
-    cout << "[querying] rank buckets for each query                           ";
-    time_recorder.restart();
-    for (int i = 0; i < para.query_size; i++) {
-        // determine the sequence of probing bucket(except probing by looking up)
-        queries.push_back(new QueryType(index, query_data[i], metric, accessor, para ) );
-    }
-    cout << "using time :" << time_recorder.elapsed() << endl;
 
     const char * spliter = ", ";
     cout << "==============================================================================" << endl;
@@ -136,35 +129,49 @@ int SearchIterative(parameter &para, int distance_metric) {
          << "avg items"
          << "\n";
 
-    time_recorder.restart();
     for (int num_items = 1; num_items / 2 < para.base_size; num_items *= 2 ) {
 
         if ( num_items > para.base_size )
             num_items = para.base_size;
 
-        vector<vector<pair<float, unsigned> > > current_topK(para.query_size);    //TODO copy should be avoided
-        vector<unsigned>                        item_probed(para.query_size);
+        vector<vector<pair<float, unsigned> > >   current_topK(para.query_size);    //TODO copy should be avoided
+        vector<unsigned>                          item_probed(para.query_size);
+        vector<QueryType * >                      queries(para.query_size);
 
-        for (int i = 0; i <  para.query_size; i++) {
-            // probe more bucket util the number of probed item is no less than {$numItems}
-            queries[i]->ProbeItems(num_items);
-            item_probed[i]  = queries[i]->GetNumItemsProbed();
-            current_topK[i] = queries[i]->GetSortedTopK();
+        {  /// probing
+
+            time_recorder.restart();
+
+            for (int i = 0; i < para.query_size; i++) {
+                /// determine the sequence of probing bucket(except probing by looking up)
+                queries[i] = (new QueryType(&index, query_data[i], metric, accessor, para) );
+            }
+
+            for (int i = 0; i <  para.query_size; i++) {  /// probing
+                /// probe more bucket util the number of probed item is no less than {$numItems}
+                queries[i]->ProbeItems(num_items);
+                item_probed[i]  = queries[i]->GetNumItemsProbed();
+                current_topK[i] = queries[i]->GetSortedTopK();
+            }
+
+            for (int i = 0; i < para.query_size; i++) {
+                delete  queries[i];
+            }
         }
 
-        // statistic such as recall, precision, probing time and probed items
-        Bencher current_bench(current_topK, true);
-        cout << num_items                                                << spliter
-             << time_recorder.elapsed()                                  << spliter
-             << truth_bench.avg_recall(current_bench)                    << spliter
-             << truth_bench.avg_precision(current_bench, item_probed)    << spliter
-             << truth_bench.avg_error(current_bench)                     << spliter
-             << truth_bench.avg_items(item_probed)                       << "\n";
-    }
+        /// statistic such as recall, precision, probing time and probed items
+        double timer_elapsed = time_recorder.elapsed();
 
-    delete index;
-    for (int i =0 ; i < para.query_size; i++) {
-        delete queries[i];
+        {
+            Bencher current_bench(current_topK, true);
+            cout << num_items                                                << spliter
+                 << timer_elapsed                                            << spliter
+                 << truth_bench.avg_recall(current_bench)                    << spliter
+                 << truth_bench.avg_precision(current_bench, item_probed)    << spliter
+                 << truth_bench.avg_error(current_bench)                     << spliter
+                 << truth_bench.avg_items(item_probed)                       << "\n";
+        }
+
     }
 
     return 0;

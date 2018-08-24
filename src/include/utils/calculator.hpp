@@ -57,16 +57,6 @@ namespace ss {
                 });
     }
 
-    template <class DataType >
-    DataType inline EuclidDistance(const DataType *a, const DataType *b, int dim) {
-
-        DataType sum = .0;
-        for (int i = 0; i < dim; ++i) {
-            sum += (a[i] - b[i]) * (a[i] - b[i]);
-        }
-        return sqrt(sum);
-    }
-
 
     template <class DataType >
     DataType inline InnerProduct(const DataType *a, const DataType *b, int dim) {
@@ -76,6 +66,17 @@ namespace ss {
             sum += a[i] * b[i];
         }
         return sum;
+    }
+
+    template <class DataType>
+    DataType inline CalculateNorm(const DataType *a, int dim) {
+        return std::sqrt(InnerProduct(a, a, dim));
+    }
+
+
+    template <class DataType >
+    DataType inline Cosine(const DataType *a, const DataType *b, int dim) {
+        return InnerProduct(a, b, dim) / CalculateNorm(a, dim) / CalculateNorm(b, dim);
     }
 
 
@@ -89,10 +90,27 @@ namespace ss {
         return sum;
     }
 
-    template <class DataType>
-    DataType inline CalculateNorm(const DataType *a, int dim) {
-        return std::sqrt(InnerProduct(a, a, dim));
+
+    template <class DataType >
+    DataType inline EuclidDistance(const DataType *a, const DataType *b, int dim) {
+
+        DataType sum = .0;
+        for (int i = 0; i < dim; ++i) {
+            sum += (a[i] - b[i]) * (a[i] - b[i]);
+        }
+        return sqrt(sum);
     }
+
+    template <class DataType >
+    DataType inline AngularDistance(const DataType *a, const DataType *b, int dim) {
+        return std::acos(Cosine(a, b, dim));
+    }
+
+    template <class DataType >
+    DataType inline InnerProductDistance(const DataType *a, const DataType *b, int dim) {
+        return - InnerProduct(a, b, dim);
+    }
+
 
     template <class DataType>
     void inline ScaleData(DataType *target, const DataType *data, DataType scale, int dim) {
@@ -105,7 +123,7 @@ namespace ss {
     void inline SimpleLSHTransform(DataType *transform_buffer, const DataType *data, DataType norm, DataType scale,
                                    int origin_dim) {
         
-        if (scale<norm) {
+        if (scale < norm) {
             std::cerr <<"the vector's scale: "<< scale <<" is smaller than norm: " << norm <<std:: endl;
             scale = norm;
         }

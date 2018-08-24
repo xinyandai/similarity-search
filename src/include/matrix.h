@@ -66,11 +66,11 @@ namespace lshbox {
         }
 
         const T *operator [] (int i) const {
-            return _data + i * _dimension;
+            return _data + i * static_cast<size_t >(_dimension);/// i * dimension may overflow int
         }
 
         T *operator [] (int i) {
-            return _data + i * _dimension;
+            return _data + i * static_cast<size_t >(_dimension);/// i * dimension may overflow int
         }
 
         int getDim() const {

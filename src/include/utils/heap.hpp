@@ -67,3 +67,53 @@ public:
     }
 };
 
+/// TODO(Xinyan) : use std::vector and std::make_heap to replace priority queue
+template <
+        typename DataT,
+        typename DistType=float,
+        typename HeapElement=MaxHeapElement<DataT, DistType>
+>
+class Heap {
+
+private:
+    int                          _K;
+    priority_queue<HeapElement > _heap;
+public:
+    Heap(int K) {
+        _K = K;
+    }
+
+    void Insert(const HeapElement& pair) {
+        if (_heap.size() < _K)
+            _heap.push(pair);
+        else {
+            if (pair.dist() < _heap.top().dist()) {
+                _heap.pop();
+                _heap.push(pair);
+            }
+        }
+    }
+
+    void Insert(DistType dist, DataT data) {
+        Insert(HeapElement(dist, data));
+    }
+
+
+    vector<HeapElement> GetTopK() const {
+        priority_queue<HeapElement > heap = _heap;
+        vector<HeapElement> results;
+
+        while (!heap.empty()) {
+            results.push_back(heap.top());
+            heap.pop();
+        }
+        std::reverse(results.begin(), results.end());
+        return results;
+    }
+
+    int getK() const {
+        return _K;
+    }
+
+};
+

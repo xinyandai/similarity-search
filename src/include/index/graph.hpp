@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-/// Copyright 2018-present      DAI<    .dai@outlook.com>
+/// Copyright 2018-present Xinyan DAI<xinyan.dai@outlook.com>
 ///
 /// permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 /// documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -16,45 +16,53 @@
 /// SOFTWARE.
 
 /// @version 0.1
-/// @author       DAI
-/// @contact     .dai@outlook.com
+/// @author  Xinyan DAI
+/// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-#include <iostream>
-#include <boost/program_options.hpp>
+#include <utility>
+#include <vector>
+#include <random>
+#include <unordered_map>
+#include <boost/progress.hpp>
 
-namespace ss{
+#include "../index.hpp"
+#include "../utils/ground_truth.h"
 
+namespace ss {
 
-struct parameter {
-    std::string train_data;
-    std::string base_data;
-    std::string query_data;
-    std::string ground_truth;
+    using namespace std;
 
-    int topK;
-    int num_thread;
-    int dim;
-    int transformed_dim;
-    int origin_dim;
-    int graph_K;
+    template<class DataType>
+    class GraphIndex : public Index<DataType> {
+        typedef MaxHeapElement<int> Neighbor;
+        vector<vector<Neighbor > > _graph;
+    public:
+        explicit GraphIndex(const parameter& para) : Index<DataType >(para){}
 
-    int kmeans_centers;
-    int num_codebook;
+        void Train(const lshbox::Matrix<DataType > & data) override {
+            /// do nothing here
+        }
 
-    int num_bit;
-    int num_sub_data_set;
+        void Add(const lshbox::Matrix<DataType > & data) override {
+            ///
+            _graph = ss::ExactKNN<DataType>(
+                    data[0],
+                    data.getSize(),
+                    data[0],
+                    data.getSize(),
+                    data.getDim(),
+                    this->_para.graph_K,
+                    ss::EuclidDistance<DataType >
+            );
+        }
 
-    int train_size;
-    int query_size;
-    int base_size;
+        const vector<vector<Neighbor > >& GetGraph() {
+            return _graph;
+        }
 
-    int iteration; // training iteraions
-
-    float r; // h(x) = ceil[(av+b)/r]
-
-} typedef parameter;
+    };
 
 }

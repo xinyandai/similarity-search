@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-/// Copyright 2018-present      DAI<    .dai@outlook.com>
+/// Copyright 2018-present Xinyan DAI<xinyan.dai@outlook.com>
 ///
 /// permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 /// documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -16,45 +16,45 @@
 /// SOFTWARE.
 
 /// @version 0.1
-/// @author       DAI
-/// @contact     .dai@outlook.com
+/// @author  Xinyan DAI
+/// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-#include <iostream>
-#include <boost/program_options.hpp>
+#include "sorter/radix_sorter.hpp"
 
-namespace ss{
+#include "../parameters.hpp"
+#include "../query.hpp"
+#include "../index/map_index.hpp"
+#include "../utils/calculator.hpp"
+
+namespace ss {
+
+    using namespace lshbox;
+
+    template <class DataType>
+    class GraphSearch : public Query<DataType > {
+
+        using AccessorType = typename lshbox::Matrix<DataType>::Accessor;
+    protected:
 
 
-struct parameter {
-    std::string train_data;
-    std::string base_data;
-    std::string query_data;
-    std::string ground_truth;
+    public:
+        ~IntRanker() {}
 
-    int topK;
-    int num_thread;
-    int dim;
-    int transformed_dim;
-    int origin_dim;
-    int graph_K;
+        explicit GraphSearch(
+                MapIndex<DataType, vector<int> > * index,
+                DataType *                         query,
+                lshbox::Metric<DataType > &        metric,
+                const AccessorType &               accessor,
+                const parameter &                  para)
+                :
+                Query<DataType >(index, query, metric, accessor, para) {}
 
-    int kmeans_centers;
-    int num_codebook;
+        const vector<int >& NextBucket() override { }
 
-    int num_bit;
-    int num_sub_data_set;
+        bool NextBucketExisted() const override   { }
 
-    int train_size;
-    int query_size;
-    int base_size;
-
-    int iteration; // training iteraions
-
-    float r; // h(x) = ceil[(av+b)/r]
-
-} typedef parameter;
-
+    };
 }

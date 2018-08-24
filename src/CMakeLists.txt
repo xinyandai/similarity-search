@@ -28,6 +28,7 @@ SET(EXAMPLES
         simple_lsh
         kmeans
         pq
+        ground_truth
 )
 
 FOREACH(EXAMPLE ${EXAMPLES} )
