@@ -80,8 +80,8 @@ void LoadOptions(int argc, char **argv, parameter &para) {
     }
 }
 
-template <class DataType, class IndexType, class QueryType>
-int SearchIterative(parameter &para, int distance_metric) {
+template <class DataType, class IndexType, class QueryType, class MetricType=ss::EuclidMetric<DataType> >
+int SearchIterative(parameter &para) {
     ss::timer time_recorder;
 
     cout    << "==============================================================================" << endl;
@@ -103,8 +103,7 @@ int SearchIterative(parameter &para, int distance_metric) {
     para.dim        = train_data.getDim() + para.transformed_dim; /// useful when add dimensions for some algorithm
     para.origin_dim = train_data.getDim();
 
-    //// choose the metric
-    Metric<DataType >  metric(train_data.getDim(), distance_metric);
+    MetricType metric(para.origin_dim);
 
     cout << "[training] initial the index." << endl;
     IndexType index(para);

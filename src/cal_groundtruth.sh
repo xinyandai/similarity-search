@@ -2,15 +2,15 @@
 # rm -rf build/
 mkdir build/
 cd build/
-# cmake .. -DCMAKE_BUILD_TYPE=Debug
-cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake .. -DCMAKE_BUILD_TYPE=Debug
+# cmake .. -DCMAKE_BUILD_TYPE=Release
 make ground_truth -j16
 
 topk=20
 numThreads=16
 # metric="product"
-# metric="angular"
-metric="euclidean"
+ metric="angular"
+#metric="euclid"
 
 
 for dataset in "audio"

@@ -82,7 +82,7 @@ namespace ss {
 
     template <class DataType >
     DataType inline Cosine(const DataType *a, const DataType *b, int dim) {
-        return InnerProduct(a, b, dim) / CalculateNorm(a, dim) / CalculateNorm(b, dim);
+        return InnerProduct(a, b, dim) / static_cast<double >(CalculateNorm(a, dim)) / CalculateNorm(b, dim);
     }
 
 

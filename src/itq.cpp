@@ -38,11 +38,15 @@ using namespace ss;
 
 
 int main(int argc, char** argv) {
+
     parameter para;
     LoadOptions(argc, argv, para);
+
     using DataType = float;
     using IndexType = ITQIndex<DataType>;
     using QueryType = HammingRanker<DataType> ;
-    SearchIterative<DataType, IndexType, QueryType>(para, L2_DIST);
+
+
+    SearchIterative<DataType, IndexType, QueryType>(para);
 }
 

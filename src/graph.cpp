@@ -41,13 +41,14 @@ using namespace ss;
 
 
 int main(int argc, char** argv) {
-    using DataType = float;
-
-    using IndexType =  ss::GraphIndex<DataType >;
-    using QueryType =  ss::GraphSearch<DataType >;
 
     parameter para;
     LoadOptions(argc, argv, para);
-    SearchIterative<DataType, IndexType, QueryType>(para, L2_DIST);
+
+    using DataType  = float;
+    using IndexType =  ss::GraphIndex<DataType >;
+    using QueryType =  ss::GraphSearch<DataType >;
+
+    SearchIterative<DataType, IndexType, QueryType>(para);
 }
 

@@ -40,9 +40,14 @@ using namespace ss;
 
 
 int main(int argc, char** argv) {
-    using DataType = float;
+
     parameter para;
     LoadOptions(argc, argv, para);
-    SearchIterative<DataType, ss::E2LSHIndex<DataType>, ss::IntRanker<DataType> >(para, L2_DIST);
+
+    using DataType  = float;
+    using IndexType = ss::E2LSHIndex<DataType>;
+    using QueryType = ss::IntRanker<DataType>;
+
+    SearchIterative<DataType, IndexType, QueryType >(para);
 }
 

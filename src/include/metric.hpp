@@ -24,110 +24,66 @@
 /// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
 
-/**
- * @file metric.h
- *
- * @brief Common distance measures.
- */
 #pragma once
 
 #include <assert.h>
 
 #include <cmath>
+#include "utils/calculator.hpp"
 
-namespace ss
-{
-#define L1_DIST 1
-#define L2_DIST 2
-#define AG_DIST 3    // angular distance
-#define IP_DIST 4    // angular distance
-/**
- * The calculation of square.
- */
-template <typename DATATYPE>
-DATATYPE sqr(const DATATYPE &x)
-{
-    return x * x;
-}
-/**
- * Use for common distance functions.
- */
-template <typename DATATYPE>
-class Metric
-{
-    unsigned type_;
-    unsigned dim_;
-public:
-    /**
-     * Constructor for this class.
-     *
-     * @param dim  Dimension of each vector
-     * @param type The way to measure the distance, you can choose 1(L1_DIST) or 2(L2_DIST)
-     */
-    Metric(unsigned dim, unsigned type): dim_(dim), type_(type) {}
-    ~Metric() {}
-    /**
-     * Get the dimension of the vectors
-     */
-    unsigned dim() const
-    {
-        return dim_;
-    }
-    /**
-     * measure the distance.
-     *
-     * @param  vec1 The first vector
-     * @param  vec2 The second vector
-     * @return      The distance
-     */
-    float dist(const DATATYPE *vec1, const DATATYPE *vec2) const
-    {
-        float dist_ = 0.0;
-        switch (type_)
-        {
-        case L1_DIST:
-        {
-            for (unsigned i = 0; i != dim_; ++i)
-            {
-                dist_ +=  static_cast<float>( std::abs(vec1[i] * 1.0 - vec2[i]));
-            }
-            return dist_;
-        }
-        case L2_DIST:
-        {
-            for (unsigned i = 0; i != dim_; ++i)
-            {
-                dist_ += sqr(vec1[i] - vec2[i]);
-            }
-            return std::sqrt(dist_);
-        }
-        case AG_DIST:
-        {
-            float norm_1 = 0.0;
-            float norm_2 = 0.0;
-            for (unsigned i = 0; i != dim_; ++i)
-            {
-                dist_ += vec1[i] * vec2[i];
-                norm_1 += sqr(vec1[i]);
-                norm_2 += sqr(vec2[i]);
-            }
-            return acos( dist_ / std::sqrt(norm_1*norm_2) );
-        }
-        case IP_DIST:
-        {
-            for (unsigned i = 0; i != dim_; ++i)
-            {
-                dist_ += vec1[i] * vec2[i];
-            }
-            return - dist_;
+namespace ss {
+
+    template <typename DataType>
+    class Metric {
+    private:
+        int  dim_;
+    public:
+        explicit Metric(int dim): dim_(dim) {}
+
+        int dim() const {
+            return dim_;
         }
 
-        default:
-        {
-            assert(false);
+        virtual float dist(const DataType *vec1, const DataType *vec2) const  = 0;
+    };
+
+    template <typename  DataType>
+    class EuclidMetric : public Metric<DataType > {
+
+    public:
+        explicit EuclidMetric(int dim):Metric<DataType >(dim) {}
+
+        float dist(const DataType *vec1, const DataType *vec2) const override {
+
+            return ss::EuclidDistance(vec1, vec2, this->dim());
         }
+
+    };
+
+    template <typename  DataType>
+    class IPDistance : public Metric<DataType > {
+
+    public:
+        explicit IPDistance(int dim):Metric<DataType >(dim) {}
+
+        float dist(const DataType *vec1, const DataType *vec2) const override {
+
+            return ss::InnerProductDistance(vec1, vec2, this->dim());
         }
-    }
-};
+
+    };
+
+    template <typename  DataType>
+    class AngularMetric : public Metric<DataType > {
+
+    public:
+        explicit AngularMetric(int dim):Metric<DataType >(dim) {}
+
+        float dist(const DataType *vec1, const DataType *vec2) const override {
+
+            return ss::AngularDistance(vec1, vec2, this->dim());
+        }
+
+    };
 
 } // namespace ss

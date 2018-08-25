@@ -38,9 +38,15 @@ using namespace ss;
 
 
 int main(int argc, char** argv) {
-    using DataType = float;
+
     parameter para;
     LoadOptions(argc, argv, para);
-    SearchIterative<DataType, SRPIndex<DataType>, HammingRanker<DataType> >(para, AG_DIST);
+
+    using DataType   = float;
+    using IndexType  = SRPIndex<DataType>;
+    using QueryType  = HammingRanker<DataType>;
+    using MetricType = AngularMetric<DataType >;
+
+    SearchIterative<DataType, IndexType, QueryType, MetricType >(para);
 }
 

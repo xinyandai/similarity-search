@@ -46,7 +46,7 @@ namespace ss {
     class Scanner {
 
     private:
-        Metric<DataType>            _metric;
+        const Metric<DataType> &    _metric;
         Heap<int, float>            _heap;
         int                         _K;
         int                         _count;

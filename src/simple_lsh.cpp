@@ -43,14 +43,15 @@ using namespace ss;
 
 int main(int argc, char** argv) {
 
-    using DataType = float;
-    using KeyType  = uint64_t ;
-
-    using IndexType =  ss::SimpleLSHIndex<DataType, KeyType, ss::SRPIndex<DataType > >;
-    using QueryType =  ss::HammingRanker<DataType >;
-
     parameter para;
     LoadOptions(argc, argv, para);
-    SearchIterative<DataType, IndexType, QueryType>(para, IP_DIST);
+
+    using DataType   = float;
+    using KeyType    = uint64_t ;
+    using IndexType  =  ss::SimpleLSHIndex<DataType, KeyType, ss::SRPIndex<DataType > >;
+    using QueryType  =  ss::HammingRanker<DataType >;
+    using MetricType = IPDistance<DataType >;
+
+    SearchIterative<DataType, IndexType, QueryType, MetricType >(para);
 }
 

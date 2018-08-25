@@ -41,9 +41,16 @@ using namespace ss;
 
 
 int main(int argc, char** argv) {
-    using DataType = float;
+
     parameter para;
     LoadOptions(argc, argv, para);
-    SearchIterative<DataType, NormRangeIndex<DataType>, NormRangeQuery<DataType> >(para, IP_DIST);
+
+    using DataType   = float;
+    using IndexType  = NormRangeIndex<DataType>;
+    using QueryType  = NormRangeQuery<DataType>;
+    using MetricType = IPDistance<DataType >;
+
+    SearchIterative<DataType, IndexType, QueryType, MetricType >(para);
+
 }
 

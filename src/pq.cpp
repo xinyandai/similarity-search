@@ -41,13 +41,14 @@ using namespace ss;
 
 
 int main(int argc, char** argv) {
-    using DataType = float;
-
-    using IndexType =  ss::PQIndex<DataType >;
-    using QueryType =  ss::IMIProber<DataType >;
 
     parameter para;
     LoadOptions(argc, argv, para);
-    SearchIterative<DataType, IndexType, QueryType>(para, L2_DIST);
+
+    using DataType  = float;
+    using IndexType =  ss::PQIndex<DataType >;
+    using QueryType =  ss::IMIProber<DataType >;
+
+    SearchIterative<DataType, IndexType, QueryType>(para);
 }
 

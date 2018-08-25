@@ -41,13 +41,14 @@ using namespace ss;
 
 
 int main(int argc, char** argv) {
-    using DataType = float;
-
-    using IndexType =  ss::KMeansIndex<DataType >;
-    using QueryType =  ss::ClusterRanker<DataType >;
 
     parameter para;
     LoadOptions(argc, argv, para);
-    SearchIterative<DataType, IndexType, QueryType>(para, L2_DIST);
+
+    using DataType  = float;
+    using IndexType =  ss::KMeansIndex<DataType >;
+    using QueryType =  ss::ClusterRanker<DataType >;
+
+    SearchIterative<DataType, IndexType, QueryType >(para);
 }
 
