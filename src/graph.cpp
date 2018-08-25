@@ -24,42 +24,30 @@
 /// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
 
-#pragma once
+#include <iostream>
 
-#include <string>
+#include "include/parameters.hpp"
+#include "matrix.hpp"
+#include "metric.hpp"
+
+#include "include/index/graph.hpp"
+#include "include/query/graph_search.hpp"
+
+#include "executor.hpp"
 
 
-namespace ss{
+using namespace std;
+using namespace ss;
 
-    struct parameter {
-        std::string train_data;
-        std::string base_data;
-        std::string query_data;
-        std::string ground_truth;
 
-        std::string graph_knn;
+int main(int argc, char** argv) {
+    using DataType = float;
 
-        int topK;
-        int num_thread;
-        int dim;
-        int transformed_dim;
-        int origin_dim;
-        int graph_K;
+    using IndexType =  ss::GraphIndex<DataType >;
+    using QueryType =  ss::GraphSearch<DataType >;
 
-        int kmeans_centers;
-        int num_codebook;
+    parameter para;
+    LoadOptions(argc, argv, para);
+    SearchIterative<DataType, IndexType, QueryType>(para, L2_DIST);
+}
 
-        int num_bit;
-        int num_sub_data_set;
-
-        int train_size;
-        int query_size;
-        int base_size;
-
-        int iteration; // training iteraions
-
-        float r; // h(x) = ceil[(av+b)/r]
-
-    } typedef parameter;
-
-} // namespace ss

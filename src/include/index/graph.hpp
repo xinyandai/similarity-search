@@ -51,15 +51,21 @@ namespace ss {
 
         void Add(const Matrix<DataType > & data) override {
             ///
-            _graph = ss::ExactKNN<DataType>(
-                    data[0],
-                    data.getSize(),
-                    data[0],
-                    data.getSize(),
-                    data.getDim(),
-                    this->_para.graph_K,
-                    ss::EuclidDistance<DataType >
-            );
+            if (this->_para.graph_knn != "") {
+
+                _graph = ss::GroundWriter::ReadLSHBOX(this->_para.graph_knn.c_str());
+
+            } else {
+                _graph = ss::ExactKNN<DataType>(
+                        data[0],
+                        data.getSize(),
+                        data[0],
+                        data.getSize(),
+                        data.getDim(),
+                        this->_para.graph_K,
+                        ss::EuclidDistance<DataType >
+                );
+            }
         }
 
         const vector<vector<Neighbor > >& GetGraph() {

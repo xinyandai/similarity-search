@@ -26,12 +26,15 @@
 
 #pragma once
 
+#include <unordered_map>
 #include <vector>
 
 #include "../../query.hpp"
 #include "../../utils/hashers.hpp"
 
 namespace ss {
+
+    using std::unordered_map;
 
     template <class DataType, class KeyType >
     class RadixSorter {

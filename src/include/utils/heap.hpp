@@ -40,6 +40,8 @@ protected:
     DataT       _data;
 
 public:
+    DistanceElement() = default;
+
     DistanceElement(DistType dist, const DataT& data): _dist(dist), _data(data) {}
 
     explicit DistanceElement(const pair<DistType, DataT>& p): _dist(p.first), _data(p.second) {}
@@ -58,6 +60,9 @@ public:
 template<typename DataT, typename DistType=float>
 class MinHeapElement : public DistanceElement<DataT> {
 public:
+
+    MinHeapElement() = default;
+
     MinHeapElement(DistType dist, const DataT& data) : DistanceElement<DataT>(dist, data) {}
 
     bool operator<(const MinHeapElement& other) const  {
@@ -69,6 +74,9 @@ public:
 template<typename DataT, typename DistType=float>
 class MaxHeapElement : public DistanceElement<DataT, DistType> {
 public:
+
+    MaxHeapElement() = default;
+
     MaxHeapElement(DistType dist, const DataT& data) : DistanceElement<DataT>(dist, data) {}
 
     bool operator<(const MaxHeapElement& other) const  {
@@ -92,22 +100,25 @@ public:
         _K = K;
     }
 
-    void Insert(const HeapElement& pair) {
+    bool Insert(const HeapElement& pair) {
         if (_heap.size() < _K) {
             _heap.push_back(pair);
             std::push_heap(_heap.begin(), _heap.end());
+            return true;
         } else {
             if (pair.dist() < _heap[0].dist()) {
                 std::pop_heap(_heap.begin(), _heap.end());
                 _heap[_K-1] =  pair;/// pop the max one and swap it
                 std::push_heap(_heap.begin(), _heap.end());
+                return true;
             }
         }
+        return false;
     }
 
 
-    void Insert(DistType dist, DataT data) {
-        Insert(HeapElement(dist, data));
+    bool Insert(DistType dist, DataT data) {
+        return Insert(HeapElement(dist, data));
     }
 
 

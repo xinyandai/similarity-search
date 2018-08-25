@@ -80,9 +80,11 @@ namespace ss {
          * Update the current query by scanning key, this is normally invoked by the LSH
          * index structure.
          */
-        void operator () (int id) {
+        std::pair<float, bool > operator () (int id) {
             ++_count;
-            _heap.Insert(CalDist(id), id);
+            float distance = CalDist(id);
+            bool  success  = _heap.Insert(distance, id);
+            return  std::make_pair(distance, success);
         }
 
 

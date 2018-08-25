@@ -26,14 +26,113 @@
 
 #pragma once
 
-#include <vector>
+#include <assert.h>
+
 #include <functional>
+#include <fstream>
+#include <omp.h>
+#include <sstream>
+#include <vector>
+
+#include <boost/progress.hpp>
 
 #include "heap.hpp"
 
 namespace ss {
 
     using std::vector;
+    using std::cout;
+    using std::endl;
+    using std::ios;
+    using std::ifstream;
+    using std::ofstream;
+    using std::string;
+
+    namespace GroundWriter {
+
+        template<typename DataType>
+        void WriteLSHBOX(const char *bench_file, const vector<vector<MaxHeapElement<int> > > &knn) {
+            // lshbox file
+            ofstream lshboxFout(bench_file);
+            if (!lshboxFout) {
+                cout << "cannot create output file " << bench_file << endl;
+                assert(false);
+            }
+            int K = knn[0].size();
+            lshboxFout << knn.size() << "\t" << K << endl;
+            for (int i = 0; i < knn.size(); ++i) {
+                assert(knn[i].size() == K);
+                lshboxFout << i << "\t";
+                const vector<MaxHeapElement<int>>& topker = knn[i];
+                for (int idx = 0; idx < topker.size(); ++idx) {
+                    lshboxFout << topker[idx].data() << "\t" << topker[idx].dist() << "\t";
+                }
+                lshboxFout << endl;
+            }
+            lshboxFout.close();
+            cout << "lshbox groundtruth are written into " << bench_file << endl;
+        }
+
+        template<typename DataType>
+        void WriteIVECS(const char *bench_file, const vector<vector<MaxHeapElement<int> > > &knn) {
+            // ivecs file
+            ofstream fout(bench_file, ios::binary);
+            if (!fout) {
+                cout << "cannot create output file " << bench_file << endl;
+                assert(false);
+            }
+            int K = knn[0].size();
+            for (int i = 0; i < knn.size(); ++i) {
+                assert(knn[i].size() == K);
+                fout.write((char*)&K, sizeof(int));
+                const vector<MaxHeapElement<int>> topker = knn[i];
+                for (int idx = 0; idx < topker.size(); ++idx) {
+                    fout.write((char*)&topker[idx].data(), sizeof(int));
+                }
+            }
+            fout.close();
+            cout << "ivecs groundtruth are written into " << bench_file << endl;
+        }
+
+        vector<vector<MaxHeapElement<int> > > ReadLSHBOX(const char* bench_file) {
+
+            int size;
+            int k;
+
+            string line;
+            ifstream reader(bench_file);
+
+            if (!reader) {
+                std::cerr << "can not open file " << bench_file << std::endl;
+                assert(false);
+            }
+
+            getline(reader, line);
+            std::istringstream line_stream(line);
+            line_stream >> size >> k;
+
+            vector<vector<MaxHeapElement<int> > > knns(size, vector<MaxHeapElement<int >>(k));
+
+            for (int i = 0; i < size; ++i) {
+                getline(reader, line);
+                std::istringstream line_stream(line);
+
+                int id;
+                line_stream >> id;
+
+                for (int j = 0; j < k; ++j) {
+                    int distance;
+                    int neighbor;
+                    line_stream >> neighbor >> distance ;
+                    knns[id][j] = {distance, neighbor};
+                }
+            }
+
+            return knns;
+        }
+
+    } // end namespace GroundWriter
+
 
     /// TODO(Xinyan); to be improved
     template<typename DataType >
@@ -42,7 +141,7 @@ namespace ss {
             const int num_queries,
             const DataType * items,
             const int num_items,
-            int dim,
+            const int dim,
             int K,
             std::function<float(const DataType *, const DataType *, const int )> dist) {
 
@@ -51,8 +150,16 @@ namespace ss {
         vector<HeapType> heaps(num_queries, HeapType(K));
         vector<vector<MaxHeapElement<int>>> knns(num_queries);
 
-#pragma omp for dynamic
+        boost::progress_display progress(num_queries);
+
+#pragma omp parallel for
         for (size_t query_id = 0; query_id < num_queries; ++query_id) {
+
+#pragma omp critical
+            {
+                ++progress;
+            }
+
             for (size_t item_id = 0; item_id < num_items; ++item_id) {
                 heaps[query_id].Insert(dist(&queries[query_id * dim], &items[item_id * dim], dim), item_id);
             }

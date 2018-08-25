@@ -25,61 +25,15 @@
 //////////////////////////////////////////////////////////////////////////////
 
 
+#include <functional>
 #include <vector>
 #include <string>
-#include <fstream>
 
 #include "utils/ground_truth.hpp"
 #include "matrix.hpp"
 
 using namespace std;
 
-class GroundWriter {
-public:
-    template<typename DataType>
-    void writeLSHBOX(const char* lshboxBenchFileName, const vector<vector<MaxHeapElement<int> > >& knn) {
-        // lshbox file
-        ofstream lshboxFout(lshboxBenchFileName);
-        if (!lshboxFout) {
-            cout << "cannot create output file " << lshboxBenchFileName << endl;
-            assert(false);
-        }
-        int K = knn[0].size();
-        lshboxFout << knn.size() << "\t" << K << endl;
-        for (int i = 0; i < knn.size(); ++i) {
-            assert(knn[i].size() == K);
-            lshboxFout << i << "\t";
-            const vector<MaxHeapElement<int>>& topker = knn[i];
-            for (int idx = 0; idx < topker.size(); ++idx) {
-                lshboxFout << topker[idx].data() << "\t" << topker[idx].dist() << "\t";
-            }
-            lshboxFout << endl;
-        }
-        lshboxFout.close();
-        cout << "lshbox groundtruth are written into " << lshboxBenchFileName << endl;
-    }
-
-    template<typename DataType>
-    void writeIVECS(const char* ivecsBenchFileName, const vector<vector<MaxHeapElement<int> > >& knn) {
-        // ivecs file
-        ofstream fout(ivecsBenchFileName, ios::binary);
-        if (!fout) {
-            cout << "cannot create output file " << ivecsBenchFileName << endl;
-            assert(false);
-        }
-        int K = knn[0].size();
-        for (int i = 0; i < knn.size(); ++i) {
-            assert(knn[i].size() == K);
-            fout.write((char*)&K, sizeof(int));
-            const vector<MaxHeapElement<int>> topker = knn[i];
-            for (int idx = 0; idx < topker.size(); ++idx) {
-                fout.write((char*)&topker[idx].data(), sizeof(int));
-            }
-        }
-        fout.close();
-        cout << "ivecs groundtruth are written into " << ivecsBenchFileName << endl;
-    }
-};
 
 int main(int argc, char** argv) {
 
@@ -103,6 +57,17 @@ int main(int argc, char** argv) {
     ss::Matrix<DataType> base_data (baseFileName);
     ss::Matrix<DataType> query_data(queryFileName);
 
+    std::function<float(const DataType *, const DataType *, const int )> dist;
+    if (metric == "euclid") {
+        dist = ss::EuclidDistance;
+    } else if (metric == "angular"){
+        dist = ss::AngularDistance;
+    } else if (metric == "ip") {
+        dist = ss::InnerProductDistance;
+    } else {
+        assert(false);
+    }
+
     vector<vector<MaxHeapElement<int> > > knn = ss::ExactKNN<DataType >(
             query_data[0],
             query_data.getSize(),
@@ -110,10 +75,9 @@ int main(int argc, char** argv) {
             base_data.getSize(),
             query_data.getDim(),
             K,
-            ss::EuclidDistance<DataType >);
+            dist);
 
-    GroundWriter writer;
-    writer.writeLSHBOX<DataType>(lshboxBenchFileName, knn);
-    writer.writeIVECS<DataType>(ivecsBenchFileName, knn);
+    ss::GroundWriter::WriteLSHBOX<DataType>(lshboxBenchFileName, knn);
+    ss::GroundWriter::WriteIVECS<DataType>(ivecsBenchFileName, knn);
     return 0;
 }

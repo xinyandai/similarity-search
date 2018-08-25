@@ -67,6 +67,7 @@ void LoadOptions(int argc, char **argv, parameter &para) {
         ("base_data,b",      po::value<string >(&para.base_data) ,                         "data stored in index")
         ("query_data,q",     po::value<string >(&para.query_data),                         "data for query")
         ("ground_truth,g",   po::value<string >(&para.ground_truth),                       "ground truth file")
+        ("graph_knn",        po::value<string >(&para.graph_knn),                          "k nearest neighbors")
     ;
 
     po::variables_map vm;

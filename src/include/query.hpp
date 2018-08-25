@@ -41,8 +41,8 @@ namespace ss {
 
     template <class DataType>
     class Query  {
-    
-    private:
+
+    protected:
         Index<DataType >*                _index;
         Scanner<DataType>                _scanner;
         const parameter &                _para;
@@ -68,7 +68,7 @@ namespace ss {
 
                 const vector<int>& bucket = NextBucket();
                 for(int i=0; i<bucket.size(); i++)
-                    // _scanner.operator() do three things:
+                    // _scanner.operator() do two things:
                     // 1. calculate the true distance between query and bucekt[i] 
                     // 2. try to put bucket[i] into topK(heap)
                     _scanner(bucket[i]); 
