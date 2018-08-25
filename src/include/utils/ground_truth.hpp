@@ -111,7 +111,7 @@ namespace ss {
             std::istringstream line_stream(line);
             line_stream >> size >> k;
 
-            vector<vector<MaxHeapElement<int> > > knns(size, vector<MaxHeapElement<int >>(k));
+            vector<vector<MaxHeapElement<int> > > knns(size, vector<MaxHeapElement<int >>());
 
             for (int i = 0; i < size; ++i) {
                 getline(reader, line);
@@ -120,11 +120,13 @@ namespace ss {
                 int id;
                 line_stream >> id;
 
+                knns[id].reserve(k);
+
                 for (int j = 0; j < k; ++j) {
                     int distance;
                     int neighbor;
                     line_stream >> neighbor >> distance ;
-                    knns[id][j] = {distance, neighbor};
+                    knns[id].emplace_back(MaxHeapElement<int >(distance, neighbor));
                 }
             }
 

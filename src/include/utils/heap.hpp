@@ -40,7 +40,6 @@ protected:
     DataT       _data;
 
 public:
-    DistanceElement() = default;
 
     DistanceElement(DistType dist, const DataT& data): _dist(dist), _data(data) {}
 
@@ -61,8 +60,6 @@ template<typename DataT, typename DistType=float>
 class MinHeapElement : public DistanceElement<DataT> {
 public:
 
-    MinHeapElement() = default;
-
     MinHeapElement(DistType dist, const DataT& data) : DistanceElement<DataT>(dist, data) {}
 
     bool operator<(const MinHeapElement& other) const  {
@@ -74,8 +71,6 @@ public:
 template<typename DataT, typename DistType=float>
 class MaxHeapElement : public DistanceElement<DataT, DistType> {
 public:
-
-    MaxHeapElement() = default;
 
     MaxHeapElement(DistType dist, const DataT& data) : DistanceElement<DataT>(dist, data) {}
 

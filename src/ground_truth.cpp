@@ -59,11 +59,11 @@ int main(int argc, char** argv) {
 
     std::function<float(const DataType *, const DataType *, const int )> dist;
     if (metric == "euclid") {
-        dist = ss::EuclidDistance;
+        dist = ss::EuclidDistance<DataType >;
     } else if (metric == "angular"){
-        dist = ss::AngularDistance;
+        dist = ss::AngularDistance<DataType >;
     } else if (metric == "ip") {
-        dist = ss::InnerProductDistance;
+        dist = ss::InnerProductDistance<DataType >;
     } else {
         assert(false);
     }
