@@ -24,21 +24,10 @@
 /// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
-
-#include "include/parameters.hpp"
-#include "matrix.hpp"
-#include "metric.hpp"
+#include "executor.hpp"
 
 #include "include/index/kmeans.hpp"
 #include "include/query/cluster_ranker.hpp"
-
-#include "executor.hpp"
-
-
-using namespace std;
-using namespace ss;
-
 
 int main(int argc, char** argv) {
 

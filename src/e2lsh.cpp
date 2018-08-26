@@ -24,20 +24,10 @@
 /// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
-
-#include "include/parameters.hpp"
-#include "metric.hpp"
-#include "include/utils/util.hpp"
+#include "executor.hpp"
 
 #include "include/index/e2lsh.hpp"
 #include "include/query/int_ranker.hpp"
-
-#include "executor.hpp"
-
-using namespace std;
-using namespace ss;
-
 
 int main(int argc, char** argv) {
 

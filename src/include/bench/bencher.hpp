@@ -1,30 +1,5 @@
-////////////////////////////////////////////////////////////////////////////////
-/// Copyright 2018-present Xinyan DAI<xinyan.dai@outlook.com>
-///
-/// permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to
-/// deal in the Software without restriction, including without limitation the
-/// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-/// sell copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions ofthe Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-/// IN THE SOFTWARE.
-
-/// @version 0.1
-/// @author  Xinyan DAI
-/// @contact xinyan.dai@outlook.com
-//////////////////////////////////////////////////////////////////////////////
-
 #pragma once
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -45,110 +20,114 @@ using std::istringstream;
 
 class Bencher {
 private:
-    vector<BenchRecord> nns;
-    int topK;
-    int queries;
+    vector<BenchRecord> _knns;
+    int                 _topK;
+    int                 _queries;
 public:
-    int getTopK()    const { return topK; }
-    int getQueries() const { return queries; }
+    int getTopK()    const { return _topK; }
+    int getQueries() const { return _queries; }
 
     explicit Bencher (const char* benchFile) {
-        ifstream fin(benchFile);
+        ifstream reader(benchFile);
         if (!benchFile) {
             cout << "cannot open benchFile: " << benchFile << endl;
             assert(false);
         }
 
         string line;
-        getline(fin, line);
-        istringstream issFirstLine(line);
-        issFirstLine >>queries >> topK;
+        getline(reader, line);
+        istringstream line_string(line);
+        line_string >>_queries >> _topK;
 
-        nns.reserve(queries);
-        int qid;
-        int itemId;
-        float itemDist;
-        for (int i = 0; i < queries; ++i) {
-            getline(fin, line);
-            istringstream iss(line);
-            iss >> qid;
+        _knns.reserve(_queries);
+
+        for (int i = 0; i < _queries; ++i) {
+            int query_id;
+            int item_id;
+            float distance;
+
+            getline(reader, line);
+            istringstream knn_stream(line);
+
             vector<pair<float, int>> record;
-            while(iss >> itemId >> itemDist) {
-                record.emplace_back(std::make_pair(itemDist, itemId));
+            record.reserve(_topK);
+
+            knn_stream >> query_id;
+            while(knn_stream >> item_id >> distance) {
+                record.emplace_back(std::make_pair(distance, item_id));
             }
-            nns.emplace_back(BenchRecord(qid, record, true));
+            _knns.emplace_back(BenchRecord(query_id, record, true));
         }
-        fin.close();
+        reader.close();
     }
 
-    explicit Bencher (const vector<vector<pair<float, int>>>& source, bool isSorted = false) {
-        int numQueries = source.size();
-        nns.reserve(numQueries);
+    explicit Bencher (const vector<vector<pair<float, int>>>& source, bool is_sorted = false) {
+        int num_queries = source.size();
+        _knns.reserve(num_queries);
 
-        int qid;
-        for (int i = 0; i < numQueries; ++i) {
-            qid = i;
-            nns.emplace_back(BenchRecord(qid, source[i], isSorted));
+        for (int query_id = 0; query_id < num_queries; ++query_id) {
+            _knns.emplace_back(BenchRecord(query_id, source[query_id], is_sorted));
         }
     }
 
     int size() const {
-        return this->nns.size();
+        return this->_knns.size();
     }
 
     float avg_recall(const Bencher& given) const {
         assert(this->size() >= given.size());
 
         int size = std::min(this->size(), given.size());
-        float sumRecall = 0;
+        float sum_recall = 0;
         for (int i = 0; i < size; ++i) {
-            const BenchRecord& givenRecord = given.getRecord(i);
-            sumRecall += this->nns[i].recall(givenRecord);
+            sum_recall += this->_knns[i].recall(given.getRecord(i));
         }
-        return sumRecall / size;
+        return sum_recall / size;
     }
 
     float avg_precision(const Bencher& given, const vector<int>& numItemProbed) const {
         assert(this->size() >= given.size());
 
         int size = std::min(this->size(), given.size());
-        float sumPrecision = 0;
+        float sum_precision = 0;
         for (int i = 0; i < size; ++i) {
-            const BenchRecord& givenRecord = given.getRecord(i);
-            sumPrecision += this->nns[i].precision(givenRecord, numItemProbed[i]);
+            sum_precision += this->_knns[i].precision(given.getRecord(i), numItemProbed[i]);
         }
-        return sumPrecision / size;
+        return sum_precision / size;
     }
 
     float avg_error(const Bencher& given) const {
         assert(this->size() >= given.size());
-        float sumError = 0;
+        float sum_error = 0;
         int count = 0;
 
         int size = std::min(this->size(), given.size());
         for (int i = 0; i < size; ++i) {
-            const BenchRecord& givenRecord = given.getRecord(i);;
-            float er = this->nns[i].error(givenRecord);
-            if (er >= 1) {
-                sumError += er;
+
+            float error = this->_knns[i].error(given.getRecord(i));
+
+            if (error >= 1) {
+                sum_error += error;
                 count++;
             }
         }
-        if (count == 0) return -1;
-        else return sumError / count;
+        if (count == 0)
+            return -1;
+        else
+            return sum_error / count;
     }
 
-    float avg_items(const  vector<int>& numItemProbed) {
-        if (numItemProbed.size() == 0) return 0;
+    float avg_items(const  vector<int>& num_item_probed) {
+        if (num_item_probed.size() == 0) return 0;
         uint64_t sum = 0;
-        for (const int& v : numItemProbed) {
+        for (const int& v : num_item_probed) {
             sum += v;
         }
-        double result = sum / static_cast<double>(numItemProbed.size());
+        double result = sum / static_cast<double>(num_item_probed.size());
         return  static_cast<float>(result);
     }
 
     const BenchRecord& getRecord(int qId) const {
-        return this->nns[qId];
+        return this->_knns[qId];
     }
 };

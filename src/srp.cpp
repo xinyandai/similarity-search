@@ -24,18 +24,10 @@
 /// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
-
-
-#include "include/parameters.hpp"
-#include "include/index/srp.hpp"
-#include "include/query/hamming_ranker.hpp"
-
 #include "executor.hpp"
 
-using namespace std;
-using namespace ss;
-
+#include "include/index/srp.hpp"
+#include "include/query/hamming_ranker.hpp"
 
 int main(int argc, char** argv) {
 

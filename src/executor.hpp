@@ -32,18 +32,17 @@
 
 #include <boost/program_options.hpp>
 
-#include "include/parameters.hpp"
-#include "include/index.hpp"
-
 #include "bench/bencher.hpp"
 #include "bench/benchrecord.hpp"
 
-#include "matrix.hpp"
+#include "include/parameters.hpp"
+#include "include/index.hpp"
+#include "include/matrix.hpp"
+#include "include/metric.hpp"
 #include "include/utils/util.hpp"
 
 using namespace std;
 using namespace ss;
-
 
 void LoadOptions(int argc, char **argv, parameter &para) {
     namespace po = boost::program_options;

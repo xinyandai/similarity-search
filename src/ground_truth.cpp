@@ -27,10 +27,9 @@
 
 #include <functional>
 #include <vector>
-#include <string>
 
-#include "utils/ground_truth.hpp"
-#include "matrix.hpp"
+#include "include/utils/ground_truth.hpp"
+#include "include/matrix.hpp"
 
 using namespace std;
 

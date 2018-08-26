@@ -24,18 +24,10 @@
 /// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
-
-
-#include "include/parameters.hpp"
-#include "include/index/itq.hpp"
-#include "include/query/hamming_ranker.hpp"
-
 #include "executor.hpp"
 
-using namespace std;
-using namespace ss;
-
+#include "include/index/itq.hpp"
+#include "include/query/hamming_ranker.hpp"
 
 int main(int argc, char** argv) {
 
@@ -45,7 +37,6 @@ int main(int argc, char** argv) {
     using DataType = float;
     using IndexType = ITQIndex<DataType>;
     using QueryType = HammingRanker<DataType> ;
-
 
     SearchIterative<DataType, IndexType, QueryType>(para);
 }
