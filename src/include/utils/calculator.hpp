@@ -144,6 +144,30 @@ namespace ss {
         transform_buffer[origin_dim] = 0.0;
     }
 
+    template <class DataType>
+    void inline SignALSHTransform(DataType *transform_buffer, const DataType *data, DataType norm, DataType scale,
+                                   int origin_dim, int m) {
+
+        if (scale < norm) {
+            std::cerr <<"the vector's scale: "<< scale <<" is smaller than norm: " << norm <<std:: endl;
+            scale = norm;
+        }
+        ss::ScaleData(transform_buffer, data, scale, origin_dim);
+        for (int i = 0; i < m; ++i) {
+            transform_buffer[origin_dim+i] = 0.5f - std::pow(norm/scale, 1<<(i+1)); /// 1/2 - |x|^(2^m)
+        }
+    }
+
+    template <class DataType>
+    void inline SignALSHTransform(DataType *transform_buffer, const DataType *data, int origin_dim, int m) {
+        DataType norm = ss::CalculateNorm(data, origin_dim);
+        ss::ScaleData(transform_buffer, data, norm, origin_dim);
+        for (int i = 0; i < m; ++i) {
+            transform_buffer[origin_dim+i] = 0.0;
+        }
+    }
+
+
     int inline CountBitOne(uint64_t xorval) {
         int count = 0;
 

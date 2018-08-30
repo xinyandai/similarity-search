@@ -26,55 +26,50 @@
 
 #pragma once
 
-#include <cmath>
-#include <random>
-#include <unordered_map>
 #include <vector>
-#include "map_index.hpp"
+#include <algorithm>
+#include <cmath>
+
+#include "../../utils/calculator.hpp"
+
+#include "../../index.hpp"
+#include "../srp.hpp"
 
 namespace ss {
 
     using std::vector;
 
-    template<class DataType>
-    class E2LSHIndex : public MapIndex<DataType, vector<int > > {
+    template<class DataType = float>
+    class ALSHTransformer {
 
-    protected:
-        DataType            _r;
-        vector<DataType >   _b;
-        
+        vector<DataType> _transformed_data;
+        const parameter &_para;
     public:
-        explicit E2LSHIndex(const parameter& para) : MapIndex<DataType, vector<int > >(para), _r(para.r), _b(para.num_bit) {}
 
-        void Train(const Matrix<DataType> &) override {
+        explicit ALSHTransformer(const parameter &para) : _transformed_data(para.dim), _para(para) {}
 
-            std::default_random_engine          generator;
-            std::normal_distribution<DataType > normal_dist(0.0, 1.0);
+        const DataType * TransformData(const DataType *data, DataType norm, DataType max_norm) {
 
-            for (int i = 0; i<this->_para.num_bit; i++) {
-                for (int j=0; j<this->_para.dim; j++) {
-                    this->_projectors[i][j] = normal_dist(generator);
-                }
+            DataType scale = max_norm / 0.83f; /// hard code is perfect, check the paper you self
+
+            ss::ScaleData(_transformed_data.data(), data, scale, this->_para.origin_dim);
+            for (int i = 0; i < this->_para.transformed_dim; ++i) {
+                _transformed_data[this->_para.origin_dim + i] =
+                        std::pow(norm / scale, 1 << (i + 1)); ///  |x|^(2^m)
             }
 
-            this->_r = this->_para.r;
-
-            std::uniform_real_distribution<DataType > uniform_real_dist(0.0, this->_r);
-            for (int i = 0; i<this->_para.num_bit; i++) {
-                this->_b[i] = uniform_real_dist(generator);
-            }
+            return _transformed_data.data();
         }
 
-    protected:
-
-        vector<int > Quantize(const DataType *data) override {
-            vector<int > value(this->_para.dim, 0);
-            for (int i=0; i<this->_para.num_bit; i++) {
-                DataType quantization = this->_b[i] + ss::InnerProduct(data, this->_projectors[i].data(), this->_para.dim) ;
-                value[i] = std::ceil(quantization / _r);
+        const DataType * TransformQuery(const DataType *data) {
+            DataType norm = ss::CalculateNorm(data, this->_para.origin_dim);
+            ss::ScaleData(_transformed_data.data(), data, norm, this->_para.origin_dim);
+            for (int i = 0; i < this->_para.transformed_dim; ++i) {
+                _transformed_data[this->_para.origin_dim + i] = 0.5f;
             }
-            return value;
+            return _transformed_data.data();
         }
+
     };
 
 } // namespace ss

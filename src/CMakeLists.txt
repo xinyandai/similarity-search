@@ -32,16 +32,37 @@ SET(EXAMPLES
         srp
         e2lsh
         itq
-        norm_range
-        simple_lsh
         kmeans
         pq
         graph
-        ground_truth
 )
 
 FOREACH(EXAMPLE ${EXAMPLES} )
-    ADD_EXECUTABLE(${EXAMPLE} ${EXAMPLE}.cpp)
+    ADD_EXECUTABLE(${EXAMPLE} apps/${EXAMPLE}.cpp)
     target_link_libraries(${EXAMPLE} ${Boost_LIBRARIES})
 ENDFOREACH(EXAMPLE)
 
+SET(MIPS
+        rational_nr
+        rational_sign
+        rational_alsh
+        norm_range
+        simple_lsh
+        sign_alsh
+        alsh
+        )
+
+FOREACH(EXAMPLE ${MIPS} )
+    ADD_EXECUTABLE(${EXAMPLE} mips/${EXAMPLE}.cpp)
+    target_link_libraries(${EXAMPLE} ${Boost_LIBRARIES})
+ENDFOREACH(EXAMPLE)
+
+
+SET(EXAMPLES
+        ground_truth
+        )
+
+FOREACH(EXAMPLE ${EXAMPLES} )
+    ADD_EXECUTABLE(${EXAMPLE} tool/${EXAMPLE}.cpp)
+    target_link_libraries(${EXAMPLE} ${Boost_LIBRARIES})
+ENDFOREACH(EXAMPLE)
