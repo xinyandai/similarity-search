@@ -33,7 +33,7 @@
 #include "index.hpp"
 #include "metric.hpp"
 
-#include "utils/topk.hpp"
+#include "utils/heap.hpp"
 #include "utils/calculator.hpp"
 
 namespace ss {
@@ -60,11 +60,12 @@ namespace ss {
             _index(index), 
             _query(query),
             _heap(para.topK),
-            _para(para), 
-            _metric(metric), 
+            _para(para),
+            _count(0), /// initialize as 0
+            _metric(metric),
             _data(data){}
 
-        
+
         virtual ~Query() {}
         
 
@@ -77,7 +78,7 @@ namespace ss {
                     // _scanner.operator() do two things:
                     // 1. calculate the true distance between query and bucekt[i] 
                     // 2. try to put bucket[i] into topK(heap)
-                    probe(bucket[i]); 
+                    probe(bucket[i]);
             }
         }
 
@@ -102,11 +103,11 @@ namespace ss {
             return GetNumItemsProbed() < _para.base_size;
         }
 
-        inline int GetNumItemsProbed() const {
+        virtual int GetNumItemsProbed() const {
             return _count;
         }
 
-        inline vector<pair<float, int> >  GetSortedTopK() const {
+        virtual vector<pair<float, int> >  GetSortedTopK() const {
             return _heap.TopKPairs();
         }
     };
