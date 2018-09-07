@@ -44,9 +44,12 @@ namespace ss {
 
     protected:
         Index<DataType >*                _index;
-        Scanner<DataType>                _scanner;
         const parameter &                _para;
         const DataType *                 _query;
+        Heap<int, float>                 _heap;
+        int                              _count;
+        const Metric<DataType > &        _metric;
+        const Matrix<DataType > &        _data;
     public:
         Query(Index<DataType > *          index,
               const DataType *            query,
@@ -56,9 +59,12 @@ namespace ss {
             :
             _index(index), 
             _query(query),
-            _scanner(data, metric, query, para.topK),
-            _para(para) {}
+            _heap(para.topK),
+            _para(para), 
+            _metric(metric), 
+            _data(data){}
 
+        
         virtual ~Query() {}
         
 
@@ -71,8 +77,19 @@ namespace ss {
                     // _scanner.operator() do two things:
                     // 1. calculate the true distance between query and bucekt[i] 
                     // 2. try to put bucket[i] into topK(heap)
-                    _scanner(bucket[i]); 
+                    probe(bucket[i]); 
             }
+        }
+
+        /**
+         * Update the current query by scanning key, this is normally invoked by the LSH
+         * index structure.
+         */
+        std::pair<float, bool > probe (int id) {
+            ++_count;
+            float distance = _metric.dist(_query, _data[id]);
+            bool  success  = _heap.Insert(distance, id);
+            return  std::make_pair(distance, success);
         }
 
         /**
@@ -86,11 +103,11 @@ namespace ss {
         }
 
         inline int GetNumItemsProbed() const {
-            return _scanner.count();
+            return _count;
         }
 
         inline vector<pair<float, int> >  GetSortedTopK() const {
-            return  _scanner.TopKPairs();
+            return _heap.TopKPairs();
         }
     };
 

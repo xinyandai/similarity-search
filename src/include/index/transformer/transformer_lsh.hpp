@@ -45,7 +45,7 @@ namespace ss {
     class TransformLSHIndex : public MapIndex<DataType, KeyType > {
 
     protected:
-        ss::MapIndex<DataType, KeyType > *   _index;
+        HashingIndexType *                   _index;
         std::vector<DataType>                _norms;
         DataType                             _max_norm;
         Transformer                          _transformer;
@@ -60,6 +60,10 @@ namespace ss {
             _norms(),
             _max_norm(0),
             _transformer(para) {}
+
+        HashingIndexType * GetIndex() {
+            return _index;
+        }
 
         void Train(const Matrix<DataType >& data) override {
 

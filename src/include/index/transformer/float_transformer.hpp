@@ -27,62 +27,39 @@
 #pragma once
 
 #include <vector>
-#include <iostream>
 #include <algorithm>
-#include <utility>
-#include <unordered_set>
+#include <cmath>
 
-#include "matrix.hpp"
-#include "metric.hpp"
+#include "../../utils/calculator.hpp"
 
-#include "utils/heap.hpp"
+#include "../../index.hpp"
+#include "../srp.hpp"
 
-using std::unordered_set;
-using std::pair;
-using std::vector;
 namespace ss {
 
-    template <typename DataType>
-    class Scanner {
+    using std::vector;
 
-    private:
-        const Metric<DataType> &    _metric;
-        Heap<int, float>            _heap;
-        int                         _K;
-        int                         _count;
-        const Matrix<DataType > &   _data;
-        const DataType *            _query;
+    template<class DataType=float>
+    class FloatTransformer {
 
+        vector<DataType> _transformed_data;
+        const parameter &_para;
     public:
-        Scanner(const Matrix<DataType> & data,
-                const Metric<DataType> & metric,
-                const DataType *         query,
-                int                      K)
-                :
-                _data(data), _metric(metric), _K(K), _count(0), _query(query), _heap(K) {}
 
+        FloatTransformer(const parameter &para) : _transformed_data(para.dim), _para(para) {}
 
-       
-
-
-        vector<pair<float, int > > TopKPairs() const {
-            return _heap.TopKPairs();
-        }
-
-        /**
-         * Update the current query by scanning key, this is normally invoked by the LSH
-         * index structure.
-         */
-        std::pair<float, bool > operator () (int id) {
-            ++_count;
-            float distance = CalDist(id);
-            bool  success  = _heap.Insert(distance, id);
-            return  std::make_pair(distance, success);
+        const DataType * TransformData(const DataType *data, DataType norm, DataType max_norm) {
+            /// maximum norm is 1
+            ss::ScaleData(_transformed_data.data(), data, max_norm, this->_para.origin_dim);
+            return _transformed_data.data();
         }
 
 
-        float CalDist(int id) const {
-            return _metric.dist(_query, _data[id]);
+        const DataType * TransformQuery(const DataType *data) {
+            /// norm equals 1
+            DataType norm = ss::CalculateNorm(data, this->_para.origin_dim);
+            ss::ScaleData(_transformed_data.data(), data, norm , this->_para.origin_dim);
+            return _transformed_data.data();
         }
 
     };

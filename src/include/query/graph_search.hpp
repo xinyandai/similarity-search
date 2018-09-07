@@ -79,7 +79,7 @@ namespace ss {
                     for(int i=0; i<bucket.size(); i++) {                         /// E=k=bucket.size() here
                         int id = bucket[i].data();
                         if (!_visited[id]) {                                     /// using a array to record
-                            std::pair<float, bool > result = this->_scanner(id); /// update S and U
+                            std::pair<float, bool > result = this->probe(id); /// update S and U
                             _visited[id] = true;
 
                             if (result.first < distance) {                       /// replace current Y

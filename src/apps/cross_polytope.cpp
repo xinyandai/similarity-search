@@ -26,24 +26,19 @@
 
 #include "executor.hpp"
 
-#include "index/transformer/norm_range.hpp"
-#include "query/norm_range/rational_nr.hpp"
+#include "index/cross_polytype.hpp"
+#include "query/cross_polytope.hpp"
 
 int main(int argc, char** argv) {
 
     parameter para;
     LoadOptions(argc, argv, para);
 
-    using DataType    = float;
-    using KeyType     = uint64_t ;
-    using HashType    = ss::SRPIndex<DataType >;
-    using Transformer = ss::SimpleTransformer<DataType  >;
-
-    using IndexType   = ss::NormRangeIndex<DataType, KeyType, HashType, Transformer >;
-    using QueryType   = ss::RationalNormRanking<DataType, KeyType, HashType, Transformer >;
-    using MetricType  = ss::IPDistance<DataType >;
+    using DataType   = float;
+    using IndexType  = ss::CrossPolytopeIndex<DataType>;
+    using QueryType  = ss::CrossPolytopeRanker<DataType>;
+    using MetricType = ss::AngularMetric<DataType >;
 
     SearchIterative<DataType, IndexType, QueryType, MetricType >(para);
-
 }
 

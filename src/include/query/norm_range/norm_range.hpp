@@ -31,11 +31,11 @@
 #include <vector>
 #include <index/pq.hpp>
 
-#include "sorter/bucket_sorter.hpp"
+#include "query/sorter/bucket_sorter.hpp"
 
-#include "../parameters.hpp"
-#include "../query.hpp"
-#include "../index/transformer/norm_range.hpp"
+#include "parameters.hpp"
+#include "query.hpp"
+#include "index/transformer/norm_range.hpp"
 
 namespace ss {
 

@@ -29,7 +29,7 @@
 #include "index/e2lsh.hpp"
 #include "index/transformer/norm_range.hpp"
 #include "index/transformer/alsh_transformer.hpp"
-#include "query/rational_nr.hpp"
+#include "query/norm_range/rational_alsh.hpp"
 
 int main(int argc, char** argv) {
 
@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
     using Transformer = ss::ALSHTransformer<DataType  >;
 
     using IndexType   = ss::NormRangeIndex<DataType, KeyType, HashType, Transformer >;
-    using QueryType   = ss::RationalNormRanking<DataType, KeyType, HashType, Transformer >;
+    using QueryType   = ss::RationalALSHRanking<DataType, KeyType, HashType, Transformer >;
     using MetricType  = ss::IPDistance<DataType >;
 
     SearchIterative<DataType, IndexType, QueryType, MetricType >(para);

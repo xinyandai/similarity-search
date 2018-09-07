@@ -30,6 +30,7 @@ INCLUDE_DIRECTORIES(
 
 SET(EXAMPLES
         srp
+        cross_polytope
         e2lsh
         itq
         kmeans
@@ -47,7 +48,10 @@ SET(MIPS
         rational_sign
         rational_alsh
         norm_range
+        float_lsh
         simple_lsh
+        cross_polytope_simple_lsh
+        rational_cross_polytope
         sign_alsh
         alsh
         )

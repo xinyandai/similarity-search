@@ -50,7 +50,7 @@ namespace ss {
     >
     class NormRangeIndex : public MapIndex<DataType, KeyType > {
     protected:
-        MapIndex<DataType, KeyType > *  _index;
+        HashingIndexType *              _index;
         const int                       _num_sub_data_set;
         const int                       _bit_sub_data_set;
         std::vector<DataType>           _norms;
@@ -72,6 +72,11 @@ namespace ss {
             _norms = data.calNorms(); /// TODO(Xinyan: ): should be improved
             InitializePercentile();
             _index->Train(data);
+        }
+
+
+        HashingIndexType * GetIndex() {
+            return _index;
         }
 
 
@@ -129,18 +134,27 @@ namespace ss {
          * @param query_hash
          * @return
          */
-        std::pair<int, DataType> HashDistAndPercentile(const uint64_t &bucket_key, const uint64_t &query_hash) {
-            static KeyType mask = (1<<_bit_sub_data_set) - 1; //2^i - 1 == 000000111111(i's 1 in low bits)
-            int sub_data_set = bucket_key & mask;
-            int hash_dist = ss::CountBitOne(query_hash ^ (bucket_key >> _bit_sub_data_set));
-            return std::make_pair(hash_dist, _percentiles[sub_data_set]);
+        std::pair<int, DataType> HashDistAndPercentile(const KeyType &bucket_key, const KeyType &query_hash) {
+            return std::make_pair(HashDist(bucket_key, query_hash), Percentile(bucket_key));
         }
 
-        std::pair<int, DataType> HashDistAndPercentile(const vector<int > &bucket_key, const vector<int > &query_hash) {
+        int HashDist(const uint64_t &bucket_key, const uint64_t &query_hash) {
+            return ss::CountBitOne(query_hash ^ (bucket_key >> _bit_sub_data_set));
+        }
 
+        int HashDist(const vector<int > &bucket_key, const vector<int > &query_hash) {
+            return ss::CountDiff(query_hash.data(),  bucket_key.data(), this->_para.num_bit);
+        }
+
+        DataType Percentile(const uint64_t &bucket_key) {
+            static KeyType mask = (1<<_bit_sub_data_set) - 1; //2^i - 1 == 000000111111(i's 1 in low bits)
+            int sub_data_set = bucket_key & mask;
+            return _percentiles[sub_data_set];
+        }
+
+        DataType Percentile(const vector<int > &bucket_key) {
             int sub_data_set = bucket_key[bucket_key.size()-1];
-            int hash_dist = ss::CountDiff(query_hash.data(),  bucket_key.data(), this->_para.num_bit);
-            return std::make_pair(hash_dist, _percentiles[sub_data_set]);
+            return _percentiles[sub_data_set];
         }
 
         /**

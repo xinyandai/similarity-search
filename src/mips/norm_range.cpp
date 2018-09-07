@@ -27,7 +27,7 @@
 #include "executor.hpp"
 
 #include "index/transformer/norm_range.hpp"
-#include "query/norm_range.hpp"
+#include "query/norm_range/norm_range.hpp"
 
 int main(int argc, char** argv) {
 

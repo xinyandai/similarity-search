@@ -32,33 +32,64 @@
 namespace ss{
 
     struct parameter {
+
+        /// file name of traning data
         std::string train_data;
+        /// file name of base data(the data stored in index)
         std::string base_data;
+        /// file name of query data
         std::string query_data;
+        /// file name of ground truth file(exact top-k nearest neighbor)
         std::string ground_truth;
 
-        std::string graph_knn;
+        /// number of train data
+        int train_size;
+        /// number of base data(the data stord in index)
+        int base_size;
+        /// number of query data
+        int query_size;
 
+        /// the number of data should be returned
         int topK;
+
+        /// number of thread use
         int num_thread;
-        int dim;
-        int transformed_dim;
-        int origin_dim;
-        int graph_K;
 
-        int kmeans_centers;
-        int num_codebook;
-
+        /// for hash method
+        /// number of hash value
         int num_bit;
+
+        /// dimension of data, equals to transformed_dim+origin_dim
+        int dim;
+        /// for transform based method, (L2-ALSH Sign-ALSH Simple-LSH)
+        int transformed_dim;
+        /// for transform based method, dimension of original data
+        int origin_dim;
+
+        /// for norm range LSH
+        /// number of sub-data-set
         int num_sub_data_set;
 
-        int train_size;
-        int query_size;
-        int base_size;
+        /// for knn-Graph
+        /// the degree of knn-Graph
+        int graph_K;
+        /// for knn-Graph
+        /// the knn-graph file
+        std::string graph_knn;
 
-        int iteration; // training iteraions
+        /// training iterations
+        int iteration;
 
-        float r; // h(x) = ceil[(av+b)/r]
+        /// for kmeans, PQ, ..
+        /// number of centers(in each sub-space)
+        int kmeans_centers;
+        /// for kmeans, PQ, ..
+        /// number of code book
+        int num_codebook;
+
+        /// for e2lsh
+        /// h(x) = ceil[(av+b)/r]
+        float r;
 
     } typedef parameter;
 

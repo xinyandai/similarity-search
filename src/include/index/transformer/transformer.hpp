@@ -39,19 +39,12 @@ namespace ss {
 
     using std::vector;
 
-    template<class DataType >
+    template<class DataType = float>
     class Transformer {
-
-        vector<DataType> _transformed_data;
-        const parameter &_para;
     public:
-
-        explicit Transformer(const parameter &para) : _transformed_data(para.dim), _para(para) {}
-
+        ~ Transformer(){}
         virtual const DataType * TransformData(const DataType *data, DataType norm, DataType max_norm) = 0;
-
         virtual const DataType * TransformQuery(const DataType *data)  = 0;
-
     };
 
 } // namespace ss

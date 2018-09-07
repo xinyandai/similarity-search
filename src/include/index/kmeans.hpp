@@ -139,14 +139,13 @@ namespace ss {
             return nearest_center;
         }
 
-        /// I am not expected to understand why it cannot be compiled using vector<pair> directly.
-        typedef vector< pair<float, int > > VectorPair;
+
         /**
          * calculate distances from {@link vector} to each center
          * @return distances within a vector of pair<distance, center>
          */
-        VectorPair ClusterDistance(const DataType *vector, int dimension) {
-            VectorPair dist_centers(this->_para.kmeans_centers);
+        std::vector<std::pair<float, int > > ClusterDistance(const DataType *vector, int dimension) {
+            std::vector<std::pair<float, int>> dist_centers(this->_para.kmeans_centers);
             for (int center = 0; center < this->_para.kmeans_centers; ++center) {
                 DataType distance = Distance(vector, dimension, center);
                 dist_centers[center] = std::make_pair(distance, center);

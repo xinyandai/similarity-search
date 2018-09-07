@@ -30,15 +30,14 @@
 #include <utility>
 #include <vector>
 #include <index/pq.hpp>
+#include <boost/math/special_functions/beta.hpp>
+#include "query/sorter/bucket_sorter.hpp"
 
-#include "sorter/bucket_sorter.hpp"
-
-#include "../parameters.hpp"
-#include "../query.hpp"
-#include "../index/transformer/norm_range.hpp"
+#include "parameters.hpp"
+#include "query.hpp"
+#include "index/transformer/norm_range.hpp"
 
 namespace ss {
-
 
     template<
             class DataType,
@@ -46,46 +45,38 @@ namespace ss {
             class HashingIndexType,
             class Transformer
     >
-    class RationalNormRanking : public Query<DataType > {
-
+    class RationalALSHRanking :
+            public Query <DataType> {
         using MapType   = unordered_map<KeyType, vector<int>, ss::SSHasher<KeyType> >;
         using IndexType = NormRangeIndex<DataType, KeyType, HashingIndexType, Transformer >;
-
-    protected:
+    private:
         const MapType &                          _index_map;
         BucketSorter<DataType, KeyType > *       _sorter;
-
     public:
-        ~RationalNormRanking() { if(_sorter) delete _sorter; }
+        ~RationalALSHRanking() {}
 
-        explicit RationalNormRanking(
+        explicit RationalALSHRanking(
                 IndexType *                        index,
                 const DataType *                   query,
                 const Metric<DataType > &          metric,
                 const Matrix<DataType > &          data,
                 const parameter &                  para)
                 : Query<DataType >(index, query, metric, data, para),
-                  _index_map(index->getIndexMap()) {
+                  _index_map(index->getIndexMap()){
 
             { /// construction here,
 
                 /// calculate query's hash value by hash function
                 KeyType query_hash = index->HashQuery(query, -1);
-                const DataType PI = std::acos(-1);
+
                 /// distance function from query to bucket(designated by index_key)
-                auto distor = [this, &query_hash, &para, index, PI](const KeyType & index_key) {
-                    std::pair<int, DataType > hash_dist_and_norm = index->HashDistAndPercentile(index_key, query_hash);
+                auto distor = [this, &query_hash, &para, index](const KeyType & index_key) {
+
+                    std::pair<int, DataType > hash_dist_and_norm
+                            = index->HashDistAndPercentile(index_key, query_hash);
                     int num_same_bit = para.num_bit - hash_dist_and_norm.first;
                     DataType u = hash_dist_and_norm.second;
-                    DataType probability = num_same_bit / static_cast<DataType>(para.num_bit);
-
-//                    DataType shift    = 0.40f;
-//                    DataType shifted_probability = shift + (1 - shift) * probability;
-//                    DataType dist = - u *  std::cos( PI * (1.0f - shifted_probability ) );
-//                    return dist;
-                    double d = DistanceByProbability(probability);
-                    DataType dist = - u * (1 + this->_para.transformed_dim/4 - d * d);
-                    return dist;
+                    return this->distance(num_same_bit, u);
                 };
                 _sorter = new BucketSorter<DataType, KeyType>(_index_map, distor);
 
@@ -124,6 +115,15 @@ namespace ss {
             return mid;
         }
 
+        DataType distance(int num_same_bit, DataType u)  {
+            DataType probability = num_same_bit / static_cast<DataType>(this->_para.num_bit);
+            DataType shift       = 0.40f;
+            probability          = shift + (1 - shift) * probability;
+            double d = DistanceByProbability(probability);
+            DataType dist = - u * (1 + this->_para.transformed_dim/4 - d * d);
+            return dist;
+        }
+
         const vector<int> &  NextBucket() override {
             typename MapType::const_iterator bucket;
             while ( (bucket = _index_map.find(_sorter->NextBucket()) ) ==_index_map.end()) {}
@@ -133,7 +133,5 @@ namespace ss {
         bool NextBucketExisted() const override {
             return _sorter->NextBucketExisted();
         }
-
     };
-
-} // namespace ss
+}  //end namespace ss

@@ -24,10 +24,13 @@
 /// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
 
+
 #include "executor.hpp"
 
+#include "index/cross_polytype.hpp"
 #include "index/transformer/norm_range.hpp"
-#include "query/norm_range/rational_nr.hpp"
+#include "index/transformer/simple_transformer.hpp"
+#include "query/norm_range/rational_cross_polytope.hpp"
 
 int main(int argc, char** argv) {
 
@@ -35,12 +38,12 @@ int main(int argc, char** argv) {
     LoadOptions(argc, argv, para);
 
     using DataType    = float;
-    using KeyType     = uint64_t ;
-    using HashType    = ss::SRPIndex<DataType >;
+    using KeyType     = vector<int > ;
+    using HashType    = ss::CrossPolytopeIndex<DataType >;
     using Transformer = ss::SimpleTransformer<DataType  >;
 
     using IndexType   = ss::NormRangeIndex<DataType, KeyType, HashType, Transformer >;
-    using QueryType   = ss::RationalNormRanking<DataType, KeyType, HashType, Transformer >;
+    using QueryType   = ss::RationalCrossPolytopeRanking<DataType, KeyType, HashType, Transformer >;
     using MetricType  = ss::IPDistance<DataType >;
 
     SearchIterative<DataType, IndexType, QueryType, MetricType >(para);

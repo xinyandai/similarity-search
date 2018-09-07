@@ -28,7 +28,7 @@
 
 #include "index/transformer/norm_range.hpp"
 #include "index/transformer/sign_transformer.hpp"
-#include "query/rational_nr.hpp"
+#include "query/norm_range/rational_nr.hpp"
 
 int main(int argc, char** argv) {
 
