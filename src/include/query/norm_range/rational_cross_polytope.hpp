@@ -32,7 +32,6 @@
 #include <index/pq.hpp>
 #include <boost/math/special_functions/beta.hpp>
 
-#include "query/norm_range/sub_data_sorter.hpp"
 #include "query/sorter/bucket_sorter.hpp"
 
 #include "parameters.hpp"
@@ -86,7 +85,7 @@ namespace ss {
                         /// the cost to make absolute value of query[index_key[k]] bigger than actual 'max_absolute'
                         cost_metric += max_absolute - query_value * (index_key[k]>0?1:-1);
                     }
-//                    std::cout << "cost_metric: " << cost_metric << std::endl;
+
                     DataType distance_square = 2.0 - 2.0 / std::sqrt(cost_metric+1.0);
                     DataType u = index->Percentile(index_key);
                     return  - u * (8.0 - distance_square);

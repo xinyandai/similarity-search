@@ -41,8 +41,11 @@ namespace ss {
         vector<vector<vector<DataType > > > _project_matrix;
         int                                 _d_prime;
     public:
+        /**
+         * using number of k-means centers  represent "_d_prime"(actually quite similar)
+         */
         explicit CrossPolytopeIndex(const parameter& para) :
-                MapIndex<DataType, vector<int > >(para), _d_prime(4) {}
+                MapIndex<DataType, vector<int > >(para), _d_prime(para.kmeans_centers) {}
 
         void Train(const Matrix<DataType> &data) override {
 
