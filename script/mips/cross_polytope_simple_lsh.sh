@@ -30,7 +30,7 @@ do
             --transformed_dim 1 \
             --kmeans_centers ${centers} \
             --num_bit  $((code / centers_bit))\
-
+            > $log
 
         done
     done
