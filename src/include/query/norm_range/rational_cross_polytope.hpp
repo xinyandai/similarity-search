@@ -78,66 +78,24 @@ namespace ss {
                 vector<int >      max_indexes = cross_polytope->ArgMaxAbs(xs);
                 /// distance function from query to bucket(in each sub data set)
                 auto inner_distor = [&xs, &max_indexes, &query_hash, &para, index] (const KeyType & index_key) {
-                    DataType distance = 0.0f;
+                    DataType cost_metric = 0.0f;
                     for (int k = 0; k < xs.size(); ++k) {
 
                         DataType max_absolute = std::abs(xs[k][max_indexes[k]]);
                         DataType query_value = xs[k][ std::abs(index_key[k]) - 1 ]; ///index begin with 0
-                        /// the cost make absolute value of query[index_key[k]] bigger than actual 'max_absolute'
-                        distance += max_absolute - query_value * (index_key[k]>0?1:-1);
+                        /// the cost to make absolute value of query[index_key[k]] bigger than actual 'max_absolute'
+                        cost_metric += max_absolute - query_value * (index_key[k]>0?1:-1);
                     }
-
-                    return  distance;
+//                    std::cout << "cost_metric: " << cost_metric << std::endl;
+                    DataType distance_square = 2.0 - 2.0 / std::sqrt(cost_metric+1.0);
+                    DataType u = index->Percentile(index_key);
+                    return  - u * (8.0 - distance_square);
                 };
 
-                /// distance function between different sub-data-set
-                auto inter_distor = [this, &query_hash, &para, index](const KeyType & index_key) {
 
-                    std::pair<int, DataType > hash_dist_and_norm
-                            = index->HashDistAndPercentile(index_key, query_hash);
-                    int num_same_bit = para.num_bit - hash_dist_and_norm.first;
-                    DataType u = hash_dist_and_norm.second;
-                    return this->distance(num_same_bit, u);
-                };
                 /// sorter helper
                 _sorter = new BucketSorter<DataType, KeyType>(_index_map, inner_distor);
             } /// end construction
-        }
-
-
-        DataType distance(int num_same_bit, DataType u)  {
-            DataType probability = num_same_bit / static_cast<DataType>(this->_para.num_bit);
-            DataType shift       = 0.0f;
-            probability          = shift + (1 - shift) * probability;
-            DataType euclid      = DistanceByProbability(probability);
-            DataType ip_proxy    = u * (4 - euclid * euclid );
-            return - ip_proxy;
-        }
-
-
-        double Fr(double t) {
-
-            double d = 2.0;
-            return 2.0 * d * (d-1) * boost::math::beta((8.0 - t*t) / ( 4.0 - t*t), d-1);
-        }
-
-        double DistanceByProbability(double p) {
-            double mid;
-            double a = 0.0;
-            double b = 2.0; //upper bound of distance
-
-            int i=0;
-            while(i < 500) {
-                mid=(a+b)/2;
-                if(std::abs(p - Fr(mid)) < 0.00001)
-                    return mid;
-                if((Fr(mid)-p)*(Fr(a)-p)>0)
-                    a=mid;
-                else
-                    b=mid;
-                i++;
-            }
-            return mid;
         }
 
         const vector<int> &  NextBucket() override {
@@ -145,6 +103,5 @@ namespace ss {
             while ( (bucket = _index_map.find(_sorter->NextBucket()) ) ==_index_map.end()) {}
             return bucket->second;
         }
-
     };
 }  // end namespace ss

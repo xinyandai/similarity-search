@@ -42,7 +42,7 @@ namespace ss {
         int                                 _d_prime;
     public:
         explicit CrossPolytopeIndex(const parameter& para) :
-                MapIndex<DataType, vector<int > >(para), _d_prime(2) {}
+                MapIndex<DataType, vector<int > >(para), _d_prime(4) {}
 
         void Train(const Matrix<DataType> &data) override {
 
