@@ -15,6 +15,7 @@ do
         for code in 16 32 64
         do
             log="../../script/plot/data/${data_set}/top${topk}/code${code}/sign_alsh.sh"
+            mkdir ../../script/plot/data/${data_set}/top${topk}/code${code} -p
             echo "writing logs to : $log"
 
             # gdb --args \

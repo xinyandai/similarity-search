@@ -11,6 +11,7 @@ metric="product"
 topk=20
 code=16
 log="../../script/plot/data/${data_set}/top${topk}/code${code}/float_lsh.sh"
+mkdir ../../script/plot/data/${data_set}/top${topk}/code${code} -p
 echo "writing logs to : $log"
 
 # gdb --args \

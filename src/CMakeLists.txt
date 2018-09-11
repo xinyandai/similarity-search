@@ -50,6 +50,7 @@ SET(MIPS
         norm_range
         float_lsh
         simple_lsh
+        simple_e2lsh
         cross_polytope_simple_lsh
         rational_cross_polytope
         sign_alsh

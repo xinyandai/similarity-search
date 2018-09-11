@@ -23,6 +23,7 @@ do
             num_set=${sets[$i]}
 
             log="../../script/plot/data/${data_set}/top${topk}/code${code}/norm_range.sh"
+            mkdir ../../script/plot/data/${data_set}/top${topk}/code${code} -p
             echo "writing logs to : $log"
 
             #gdb --args \

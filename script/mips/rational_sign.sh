@@ -24,6 +24,7 @@ do
 
 
             log="../../script/plot/data/${data_set}/top${topk}/code${code}/rational_sign_shift_4.sh"
+            mkdir ../../script/plot/data/${data_set}/top${topk}/code${code} -p
             echo "writing logs to : $log"
 
             #gdb --args \

@@ -19,6 +19,7 @@ do
         do
 
         log="../../script/plot/data/${data_set}/top${topk}/code${code}/cross_polytope_simple_lsh.sh"
+        mkdir ../../script/plot/data/${data_set}/top${topk}/code${code} -p
         echo "writing logs to : $log"
 
         # gdb --args \
