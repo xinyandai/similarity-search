@@ -1,12 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import re
 
 top_k = 20
-code_length = 32
+code_length = 64
 # data_set = 'tinygist10million'
-data_set = 'netflix'
+# data_set = 'netflix'
 # data_set = 'yahoomusic'
-# data_set = 'imagenet'
+data_set = 'imagenet'
 # data_set = 'movielens'
 
 expected_avg_items = 0
@@ -28,7 +29,12 @@ def read_csv(file_name):
 def plot_one(method, color, x, y, linestyle="-", marker='d'):
     try:
         data = read_csv(get_csv_file(method))
-        plt.plot(data[:, x], data[:, y], color, label=method, linestyle=linestyle, marker=marker)
+        x = np.array(data[1:, x])
+        y = np.array(data[1:, y])
+        data_list = "\n  ".join(["%s %s" % (x[i], y[i]) for i in range(len(x))])
+        method_name = method.replace("_", "\\_")
+        print ('\\addplot \n table \n {\n  X Y\n  %s \n};\n\\addlegendentry{$%s$}' % (data_list, method_name))
+        plt.plot(x, y, color, label=method, linestyle=linestyle, marker=marker)
     except Exception as e:
         print(e)
 
@@ -38,7 +44,7 @@ def plot_(x_label, y_label, x, y):
     plt.xlabel(x_label)
     plt.ylabel(y_label)
 
-    plot_one('norm_range',                  'gray',     x, y, '-',  'o')
+    # plot_one('norm_range',                  'gray',     x, y, '-',  'o')
 
     plot_one('simpleLSH',                   'red',   x, y, '-.', '+')
     plot_one('alsh',                        'blue',    x, y, '--', '+')
@@ -59,5 +65,6 @@ def plot_(x_label, y_label, x, y):
 
 if __name__ == '__main__':
     plot_('probe items', 'recall', actual_avg_items, avg_recall)
-    plot_('query time', 'recall', overall_query_time, avg_recall)
-    plot_('recall', 'precision', avg_recall, avg_precision)
+    # plot_('query time', 'recall', overall_query_time, avg_recall)
+    # plot_('recall', 'precision', avg_recall, avg_precision)
+

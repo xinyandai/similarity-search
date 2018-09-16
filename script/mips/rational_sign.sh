@@ -1,30 +1,22 @@
 #!/usr/bin/env bash
 cd ../../src/
-mkdir build/
+mkdir build/ > /dev/null
 cd build/
 #cmake .. -DCMAKE_BUILD_TYPE=Debug
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make rational_sign -j16
+cmake .. -DCMAKE_BUILD_TYPE=Release  > /dev/null
+make rational_sign -j16  > /dev/null
 data_dir="../../data"
 metric="product"
 
-codes=(16 32 64)
-bits=(12 27 58)
-sets=(16 32 64)
+topk=$1
+data_set=$2
+code=$3
+num_bit=$4
+num_set=$5
 
-for topk in 20
-do
-    for data_set in "netflix" "yahoomusic" "imagenet"
-    do
-        for i in 0 1 2
-        do
-            code=${codes[$i]}
-            num_bit=${bits[$i]}
-            num_set=${sets[$i]}
-
-
-            log="../../script/plot/data/${data_set}/top${topk}/code${code}/rational_sign_shift_4.sh"
-            echo "writing logs to : $log"
+mkdir ../../script/plot/data/${data_set}/top${topk}/code${code}/ -p
+log="../../script/plot/data/${data_set}/top${topk}/code${code}/rational_sign_shift_4.sh"
+echo "writing logs to : $log"
 
             #gdb --args \
             timeout 3600 stdbuf -o0  ./rational_sign \
@@ -36,6 +28,3 @@ do
                 --num_bit ${num_bit} \
                 --num_sub_data_set ${num_set} \
                 >  $log
-        done
-    done
-done

@@ -1,21 +1,20 @@
 #!/usr/bin/env bash
 cd ../../src/
-mkdir build/
+mkdir build/ > /dev/null
 cd build/
 #cmake .. -DCMAKE_BUILD_TYPE=Debug
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make sign_alsh -j16
+cmake .. -DCMAKE_BUILD_TYPE=Release  > /dev/null
+make sign_alsh -j16  > /dev/null
 data_dir="../../data"
 metric="product"
 
-for topk in 20
-do
-    for data_set in "netflix" "yahoomusic" "imagenet"
-    do
-        for code in 16 32 64
-        do
-            log="../../script/plot/data/${data_set}/top${topk}/code${code}/sign_alsh.sh"
-            echo "writing logs to : $log"
+topk=$1
+data_set=$2
+code=$3
+
+mkdir ../../script/plot/data/${data_set}/top${topk}/code${code}/ -p
+log="../../script/plot/data/${data_set}/top${topk}/code${code}/sign_alsh.sh"
+echo "writing logs to : $log"
 
             # gdb --args \
             timeout 3600 stdbuf -o0  ./sign_alsh \
@@ -26,6 +25,3 @@ do
                 --transformed_dim 2 \
                 --num_bit ${code} \
                 > $log
-        done
-    done
-done

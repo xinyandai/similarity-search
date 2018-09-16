@@ -27,6 +27,8 @@
 #pragma once
 #include <functional>
 #include <vector>
+#include <boost/functional/hash.hpp>
+
 namespace ss {
 
     template<typename T>
@@ -40,7 +42,7 @@ namespace ss {
             size_t seed = 0;
             std::hash<T> hasher;
             for (auto& v : vec) {
-                seed ^= hasher(v);
+                boost::hash_combine(seed, v);
             }
             return seed;
         }
