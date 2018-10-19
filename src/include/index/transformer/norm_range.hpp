@@ -185,6 +185,15 @@ namespace ss {
 
         }
 
+        void UniformPercentile() {
+            DataType min = *std::min_element(std::begin(_norms), std::end(_norms));
+            DataType max = *std::max_element(std::begin(_norms), std::end(_norms));
+            _percentiles.resize(_num_sub_data_set);
+            for (int i=0; i<_num_sub_data_set; i++) {
+                _percentiles[i] = min + ((i+1.0) / _num_sub_data_set) * (max - min);
+            }
+        }
+
     };
 
 } // namespace ss
