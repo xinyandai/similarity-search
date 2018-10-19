@@ -3,59 +3,66 @@ similarity-search
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/xinyandai/similarity-search/blob/master/LICENSE)
 [![Build Status](https://travis-ci.com/xinyandai/similarity-search.svg?token=rQzxktTxAXqqyNh8ZrSa&branch=master)](https://travis-ci.com/xinyandai/similarity-search)
 ## A general framework for similarity search.
-# Run
- script
-
-    git clone https://github.com/xinyandai/similarity-search.git
-    cd similarity-search
-    sh srp.sh
-
- command
-
+### To reproduce result of our NIPS paper, please refer [MIPS](https://github.com/xinyandai/similarity-search/blob/master/MIPS.md).
+### make all  
     git clone https://github.com/xinyandai/similarity-search.git
     cd similarity-search/src
     mkdir build
     cd build
     cmake ..
-    make srp
-    ./srp -h
-    ./srp -t ${train_data_file} -b ${base_data_file} -q ${query_data_file}  -g ${ground_truth_file}
+    make all -j
+### Run PQ-IMI
 
-You should predefine  ${train_data_file} ${base_data_file} ${query_data_file} ${ground_truth_file}.
-# process
-  - 1. choose the index structure and query method
-  - 2. load data, include training data, base data and query data, ground truth is needed for recall.
-  - 3. training the index using training data
-  - 4. store the base data in index
-  - 5. for each query, probe high priority items/buckets using the choosed query method
-  - 6. for each query, re-rank the probed items
-# index type
-  - map based index
-      - bit index
-        - sign random projection
-        - ITQ
-        - PCAH(to be developed)
-      - int index
-        - e2lsh
-      - cluster index
-        - k-means
-        - PQ
-        - OPQ(to be developed)
-  - graph based index(to be developed)
-  - transform based method
-    - simple-LSH(for maximum inner product search)
-    - norm-range(for maximum inner product search)
-    - l2-ALSH(to be developed)
+    ./pq \
+        -t ../../data/audio/audio_base.fvecs  \
+        -b ../../data/audio/audio_base.fvecs  \
+        -q ../../data/audio/audio_query.fvecs \
+        -g ../../data/audio/20_audio_euclid_groundtruth.lshbox \
+        --iteration 20 \
+        --kmeans_centers 20 \
+        --num_codebook 3
 
-#  query method
-  - int ranking(for int index)
-  - hamming ranking(for bit index)
-  - cluster ranker(for cluster based method, k-means only)
-  - inverted multi index(for pq only)
-  - norm-range(for norm-range index only)
+### Run Sign Random Projection
 
-# style check
+    ./srp \
+        -t ../../data/audio/audio_base.fvecs  \
+        -b ../../data/audio/audio_base.fvecs  \
+        -q ../../data/audio/audio_query.fvecs \
+        -g ../../data/audio/20_angular_euclid_groundtruth.lshbox \
+        --num_bit 32
 
-    pip install cpplint
-    cpplint --recursive --filter=-whitespace,-runtime/indentation_namespace  src/include/*
+### Run Cross Polytope LSH
 
+    ./cross_polytope \
+        -t ../../data/audio/audio_base.fvecs  \
+        -b ../../data/audio/audio_base.fvecs  \
+        -q ../../data/audio/audio_query.fvecs \
+        -g ../../data/audio/20_angular_euclid_groundtruth.lshbox \
+        --kmeans_centers 32\
+        --num_bit  1
+    # kmeans_centers represent d' and num_bit represents the number of hash tables
+### Run Iterative Quantization
+
+    ./itq \
+        -t ../../data/audio/audio_base.fvecs  \
+        -b ../../data/audio/audio_base.fvecs  \
+        -q ../../data/audio/audio_query.fvecs \
+        -g ../../data/audio/20_audio_euclid_groundtruth.lshbox \
+        --num_bit 32
+### Run E2LSH
+
+    ./e2lsh \
+        -t ../../data/audio/audio_base.fvecs  \
+        -b ../../data/audio/audio_base.fvecs  \
+        -q ../../data/audio/audio_query.fvecs \
+        -g ../../data/audio/20_audio_euclid_groundtruth.lshbox \
+        --num_bit 32
+
+## Reference
+**[PQ based method for gradient quantization](https://github.com/xinyandai/gradient-quantization)**
+
+**[PQ based method for similarity search](https://github.com/xinyandai/product-quantization)**
+
+**[Norm-Ranging LSH for Maximum Inner Product Search](https://arxiv.org/pdf/1809.08782.pdf)**
+
+**[Norm-Range Partition: A Universal Catalyst for LSH based Maximum Inner Product Search (MIPS)](https://arxiv.org/pdf/1810.09104.pdf)**
