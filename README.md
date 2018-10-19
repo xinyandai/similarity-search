@@ -40,17 +40,17 @@ You should predefine  ${train_data_file} ${base_data_file} ${query_data_file} ${
       - cluster index
         - k-means
         - PQ
-        - OPQ(to be developed)
   - graph based index(to be developed)
-  - transform based method
-    - simple-LSH(for maximum inner product search)
-    - norm-range(for maximum inner product search)
-    - l2-ALSH(to be developed)
+  - transform based method(for maximum inner product search)
+    - Simple-LSH
+    - Norm-Range LSH
+    - L2-ALSH
+    -
 
 #  query method
   - int ranking(for int index)
   - hamming ranking(for bit index)
-  - cluster ranker(for cluster based method, k-means only)
+  - cluster ranker(for cluster based method)
   - inverted multi index(for pq only)
   - norm-range(for norm-range index only)
 
@@ -59,3 +59,10 @@ You should predefine  ${train_data_file} ${base_data_file} ${query_data_file} ${
     pip install cpplint
     cpplint --recursive --filter=-whitespace,-runtime/indentation_namespace  src/include/*
 
+# Acknowledgement
+Our project is developed based on  [GQR](https://github.com//lijinf2/gqr).
+
+# Reference
+**[PQ based method for similarity search](https://github.com/xinyandai/product-quantization)**
+
+**[Norm-Ranging LSH for Maximum Inner Product Search](https://arxiv.org/pdf/1809.08782.pdf)**
