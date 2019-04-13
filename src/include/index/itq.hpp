@@ -45,7 +45,6 @@ namespace ss {
     class ITQIndex: public MapIndex<DataType, uint64_t > {
 
         using KeyType = uint64_t;
-
     public:
 
         explicit ITQIndex(const parameter & para):  MapIndex<DataType, uint64_t >(para) {}
@@ -90,31 +89,24 @@ void ss::ITQIndex<DataType>::Train(const Matrix<DataType> & data) {
 
     {
         /// 1. wrap data with eigen
-        Eigen::MatrixXf matrix_data(data.getSize(), data.getDim());
-        for (int i = 0; i < data.getSize(); ++i) { /// TODO(Xinyan): to be improved
-            std::vector<DataType > vals(data.getDim());
-            for (int dimension = 0; dimension != data.getDim(); ++dimension) {
-                vals[dimension] = data[i][dimension];
-            }
-            matrix_data.row(i) = Eigen::Map<Eigen::VectorXf>(&vals[0], data.getDim());
-        }
+        EigenMatrix< DataType > matrix_data = data.GetEigenMatrix();
         /// 2. zero-centered
-        Eigen::MatrixXf centered = matrix_data.rowwise() - matrix_data.colwise().mean();
+        EigenMatrix< DataType > centered = matrix_data.rowwise() - matrix_data.colwise().mean();
         /// 3. use eigen-vectors to project data
-        Eigen::MatrixXf cov = (centered.transpose() * centered) / DataType (matrix_data.rows() - 1);
-        Eigen::SelfAdjointEigenSolver<Eigen::MatrixXf> eig(cov);
-        Eigen::MatrixXf eigen_vectors = eig.eigenvectors().rightCols(this->_para.num_bit);
-        Eigen::MatrixXf V = matrix_data * eigen_vectors;
+        EigenMatrix< DataType > cov = (centered.transpose() * centered) / DataType (matrix_data.rows() - 1);
+        Eigen::SelfAdjointEigenSolver<EigenMatrix< DataType >> eig(cov);
+        EigenMatrix< DataType > eigen_vectors = eig.eigenvectors().rightCols(this->_para.num_bit);
+        EigenMatrix< DataType > V = matrix_data * eigen_vectors;
         // 4. initialize R
-        Eigen::MatrixXf R(this->_para.num_bit, this->_para.num_bit);
-        Eigen::JacobiSVD<Eigen::MatrixXf> svd(R, Eigen::ComputeThinU | Eigen::ComputeThinV);
+        EigenMatrix< DataType > R(this->_para.num_bit, this->_para.num_bit);
+        Eigen::JacobiSVD<EigenMatrix< DataType >> svd(R, Eigen::ComputeThinU | Eigen::ComputeThinV);
         R = svd.matrixU();
 
         boost::progress_display progress(this->_para.iteration);
         for (int iter = 0; iter < this->_para.iteration; ++iter && ++progress) {
 
-            Eigen::MatrixXf VR = V * R;
-            Eigen::MatrixXf B(VR.rows(), VR.cols()); // n * c
+            EigenMatrix< DataType > VR = V * R;
+            EigenMatrix< DataType > B(VR.rows(), VR.cols()); // n * c
             assert(VR.rows() == this->_para.train_size);
             assert(VR.cols() == this->_para.num_bit);
 
@@ -123,7 +115,7 @@ void ss::ITQIndex<DataType>::Train(const Matrix<DataType> & data) {
                     B(i, j) = VR(i, j) > 0 ? 1 : -1;
                 }
             }
-            Eigen::JacobiSVD<Eigen::MatrixXf> svd_tmp(B.transpose() * V, Eigen::ComputeThinU | Eigen::ComputeThinV);
+            Eigen::JacobiSVD<EigenMatrix< DataType >> svd_tmp(B.transpose() * V, Eigen::ComputeThinU | Eigen::ComputeThinV);
             R = svd_tmp.matrixV() * svd_tmp.matrixU().transpose();
         }
 
