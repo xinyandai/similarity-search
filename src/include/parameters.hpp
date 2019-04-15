@@ -59,6 +59,9 @@ namespace ss{
         /// number of hash value
         int num_bit;
 
+        // number of hash tables
+        int forest_size;
+
         /// dimension of data, equals to transformed_dim+origin_dim
         int dim;
         /// for transform based method, (L2-ALSH Sign-ALSH Simple-LSH)

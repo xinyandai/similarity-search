@@ -51,6 +51,7 @@ void LoadOptions(int argc, char **argv, parameter &para) {
     opts.add_options()
         ("help,h", "help info")
         ("num_bit,l",        po::value<int   >(&para.num_bit)         ->default_value(32)  , "num of hash bit")
+        ("forest_size,f",    po::value<int   >(&para.forest_size)     ->default_value(16)  , "num of hash tables, trees")
         ("graph_K",          po::value<int   >(&para.graph_K)         ->default_value(50)  , "number of neighbors")
         // TODO(Xinyan): to support multi thread
         ("num_thread",       po::value<int   >(&para.num_thread)      ->default_value(1),    "num of thread")

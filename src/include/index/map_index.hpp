@@ -75,6 +75,13 @@ namespace ss {
             }
         }
 
+        void Search(const DataType* query, const std::function<void (int)>& prober) override {
+            const vector<int >& idx = _hash_map[this->HashQuery(query, -1)];
+            for (int id : idx) {
+                prober(id);
+            }
+        }
+
 
         virtual KeyType HashData(const DataType *data, int id)   { return this->Quantize(data); }
         virtual KeyType HashQuery(const DataType *query, int id) { return this->HashData(query, -1); }

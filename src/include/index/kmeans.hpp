@@ -68,6 +68,12 @@ namespace ss {
             Assign(Visitor<DataType >(data, 0, data.getDim()));
         }
 
+        void Search(const DataType *query, const std::function<void (int)>& prober) override {
+            const vector<int>& idx = _points[NearestCenter(query, _centers[0].size())];
+            for (int id : idx) {
+                prober(id);
+            }
+        }
 
         /***
          * iteratively update centers and re-assign points

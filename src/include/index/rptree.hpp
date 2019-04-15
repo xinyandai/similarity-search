@@ -123,11 +123,13 @@ namespace ss {
         }
 
         void Add(const Matrix<DataType> &data) override {
-
         }
 
-        const vector<int >& Search(const DataType* query) override {
-            return this->_root.ProbeLeaf(query);
+        void Search(const DataType* query, const std::function<void (int)>& prober) override {
+            const vector<int >& idx = this->_root.ProbeLeaf(query);
+            for (int id : idx) {
+                prober(id);
+            }
         }
     };
 } // namespace ss

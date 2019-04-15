@@ -37,6 +37,7 @@ SET(EXAMPLES
         pq
         graph
         rpt
+        forest
 )
 
 FOREACH(EXAMPLE ${EXAMPLES} )

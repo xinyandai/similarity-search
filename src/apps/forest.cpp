@@ -24,42 +24,24 @@
 /// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
 
-#pragma once
+#include "search.hpp"
 
-#include "matrix.hpp"
-#include "parameters.hpp"
+#include "index/forest.hpp"
+#include "index/rptree.hpp"
+#include "index/kmeans.hpp"
+#include "index/e2lsh.hpp"
+#include "query/forest_query.hpp"
 
-#include "utils/calculator.hpp"
+int main(int argc, char** argv) {
 
-namespace ss {
-    /**
-     * A interface of index structure which hold all base data.
-     * Specific Search method is provide in "include/query/" and they implement the interface of "include/query.hpp"
-     */
-    template <class DataType>
-    class Index {
+    parameter para;
+    LoadOptions(argc, argv, para);
+    using DataType   = float;
+    using QueryType  = ss::ForestQuery<DataType >;
+    using ForestType = ss::ForestIndex<DataType, KMeansIndex<DataType  > >;
+    using MetricType = ss::EuclidMetric<DataType>;
 
-    protected:
-        const parameter & _para;
-    public:
-        explicit Index(const parameter& para): _para(para) {}
-
-        /**
-         * For Locality Sensitive Hashing, random vectors will be generated for projection and the training data won't be used
-         * For Learning to Hashing, hashing functions will be learned
-         * For Graph Method, nothing will happen.
-         */    
-        virtual void Train(const Matrix<DataType> &) {}
-
-        /**
-         * all base data will be stored in this index structure.
-         */
-        virtual void Add(const Matrix<DataType> &) {}
-
-        virtual void Search(const DataType* query, const std::function<void (int)>& prober) {}
-
-        virtual ~Index() {}
-    };
-
-}  // namespace ss
+    Search<DataType, ForestType, QueryType, MetricType >(para);
+    return 0;
+}
 

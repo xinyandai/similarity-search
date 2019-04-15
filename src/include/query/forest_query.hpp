@@ -53,13 +53,7 @@ namespace ss {
                 Query<DataType >(index, query, metric, data, para) {}
 
         void ProbeItems(const int num_items) {
-
-            const vector<int>& bucket = this->_index->Search(this->_query);
-            for(int i=0; i<bucket.size(); i++)
-                // _scanner.operator() do two things:
-                // 1. calculate the true distance between query and bucekt[i]
-                // 2. try to put bucket[i] into topK(heap)
-                this->probe(bucket[i]);
+            this->_index->Search(this->_query, [&](int id) {this->probe(id); });
         }
 
         const vector<int> & NextBucket() override {}

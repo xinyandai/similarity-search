@@ -24,42 +24,53 @@
 /// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
 
+
+
 #pragma once
 
-#include "matrix.hpp"
-#include "parameters.hpp"
+#include <utility>
+#include <vector>
+#include <random>
+#include <unordered_map>
+#include <boost/progress.hpp>
 
-#include "utils/calculator.hpp"
+#include "../index.hpp"
 
 namespace ss {
-    /**
-     * A interface of index structure which hold all base data.
-     * Specific Search method is provide in "include/query/" and they implement the interface of "include/query.hpp"
-     */
-    template <class DataType>
-    class Index {
 
+    using std::vector;
+
+    template<class DataType, class IndexType>
+    class ForestIndex : public Index<DataType> {
     protected:
-        const parameter & _para;
+        vector<IndexType* > _indices;
     public:
-        explicit Index(const parameter& para): _para(para) {}
+        explicit ForestIndex(const parameter &para) :
+                Index<DataType>(para), _indices(para.forest_size) {
 
-        /**
-         * For Locality Sensitive Hashing, random vectors will be generated for projection and the training data won't be used
-         * For Learning to Hashing, hashing functions will be learned
-         * For Graph Method, nothing will happen.
-         */    
-        virtual void Train(const Matrix<DataType> &) {}
+            for (int i = 0; i < this->_para.forest_size; ++i) {
+                _indices[i] = new IndexType(para);
+            }
+        }
 
-        /**
-         * all base data will be stored in this index structure.
-         */
-        virtual void Add(const Matrix<DataType> &) {}
+        void Train(const Matrix<DataType> &data) override {
+            for (int i = 0; i < this->_para.forest_size; ++i) {
+                _indices[i]->Train(data);
+            }
+        }
 
-        virtual void Search(const DataType* query, const std::function<void (int)>& prober) {}
 
-        virtual ~Index() {}
+        void Add(const Matrix<DataType> &data) override {
+            for (int i = 0; i < this->_para.forest_size; ++i) {
+                _indices[i]->Add(data);
+            }
+        }
+
+        void Search(const DataType *query, const std::function<void (int)>& prober) override {
+            for (int i = 0; i < this->_para.forest_size; ++i) {
+                _indices[i]->Search(query, prober);
+            }
+        }
     };
 
-}  // namespace ss
-
+} // namespace ss
