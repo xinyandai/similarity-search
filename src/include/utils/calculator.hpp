@@ -37,6 +37,38 @@ namespace ss {
     using std::vector;
     using std::pair;
 
+    template <typename T>
+    vector<T > Range(T start, T end) {
+        vector<T > result(end - start);
+        for (T j = start; j < end; ++j) {
+            result[j - start] = j;
+        }
+        return result;
+    }
+
+    template <typename T>
+    vector<T> FancyIndex(const vector<T> &v, const vector<size_t > idx) {
+        vector<T> sub_vec(idx.size());
+        for (int j = 0; j < idx.size(); ++j) {
+            sub_vec[j] = v[idx[j]];
+        }
+        return sub_vec;
+    }
+
+    template <typename T>
+    vector<size_t> SortIndexes(const vector<T> &v) {
+
+        // initialize original index locations
+        vector<size_t> idx = ss::Range<size_t >(0, v.size());
+        // sort indexes based on comparing values in v
+        std::sort(
+                idx.begin(),
+                idx.end(),
+                [&v](size_t i1, size_t i2) {return v[i1] < v[i2];}
+                );
+        return idx;
+    }
+
     template <typename FirstType, typename SencondType>
     void SortPairByFirst(vector<std::pair<FirstType, SencondType> > * _sorted_bucket) {
         std::sort(

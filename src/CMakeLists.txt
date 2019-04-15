@@ -36,6 +36,7 @@ SET(EXAMPLES
         kmeans
         pq
         graph
+        rpt
 )
 
 FOREACH(EXAMPLE ${EXAMPLES} )
