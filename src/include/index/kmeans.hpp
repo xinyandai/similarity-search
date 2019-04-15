@@ -54,10 +54,17 @@ namespace ss {
                 _centers(para.kmeans_centers),
                 _points(para.kmeans_centers) {}
 
-
         const vector<vector<DataType > > & get_centers() const { return _centers; }
         const vector<vector<int > >      & get_points()  const { return _points; }
 
+        void reset(int num_centers) {
+            this->_centers = vector<vector<DataType > >(num_centers);
+            this->_points = vector<vector<int > >(num_centers);
+        }
+
+        void set_centers(const vector<vector<DataType > >& centers) {
+            _centers = centers;
+        }
 
         void Train(const Matrix<DataType > & data) override {
             iterate(Visitor<DataType >(data, 0, data.getDim()));
@@ -151,8 +158,8 @@ namespace ss {
          * @return distances within a vector of pair<distance, center>
          */
         std::vector<std::pair<float, int > > ClusterDistance(const DataType *vector, int dimension) {
-            std::vector<std::pair<float, int>> dist_centers(this->_para.kmeans_centers);
-            for (int center = 0; center < this->_para.kmeans_centers; ++center) {
+            std::vector<std::pair<float, int>> dist_centers(this->_centers.size());
+            for (int center = 0; center < (this->_centers.size()); ++center) {
                 DataType distance = Distance(vector, dimension, center);
                 dist_centers[center] = std::make_pair(distance, center);
             }

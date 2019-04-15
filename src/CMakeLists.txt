@@ -38,6 +38,7 @@ SET(EXAMPLES
         graph
         rpt
         forest
+        joint_inverted
 )
 
 FOREACH(EXAMPLE ${EXAMPLES} )

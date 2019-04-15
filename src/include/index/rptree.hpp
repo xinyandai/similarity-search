@@ -55,7 +55,7 @@ namespace ss {
         }
 
         bool IsLeaf() {
-            return this->_depth + 1 == this->_max_depth;
+            return this->_depth == this->_max_depth;
         }
 
         void _GenerateProjector(const Matrix<DataType> &data, const vector<int> &idx) {
@@ -68,7 +68,7 @@ namespace ss {
             }
         }
 
-        void MakeTree(const Matrix<DataType> &data, vector<int > idx) {
+        void MakeTree(const Matrix<DataType> &data, const vector<int > & idx) {
             if (IsLeaf()) {
                 _idx = idx;
                 return;
@@ -79,7 +79,6 @@ namespace ss {
             for (int i = 0; i < idx.size(); ++i) {
                 projected_value[i] = ss::InnerProduct(data[idx[i]], _projector.data(), _projector.size());
             }
-
             vector<size_t > sorted_idx = ss::SortIndexes(projected_value);
             vector<size_t > sorted_left_inx = vector<size_t>(sorted_idx.begin(), sorted_idx.begin() + N/2);
             vector<size_t > sorted_right_inx = vector<size_t >(sorted_idx.begin() + N/2, sorted_idx.end());
@@ -88,6 +87,7 @@ namespace ss {
 
             this->_left = new Node(_dim, _depth + 1, _max_depth);
             this->_right = new Node(_dim, _depth + 1, _max_depth);
+
             this->_left->MakeTree(data, ss::FancyIndex(idx, sorted_left_inx));
             this->_right->MakeTree(data, ss::FancyIndex(idx, sorted_right_inx));
         }
@@ -101,6 +101,16 @@ namespace ss {
                 return this->_left->ProbeLeaf(query);
             } else {
                 return this->_right->ProbeLeaf(query);
+            }
+        }
+
+        void LeafIdx(vector<vector<int > * > & leafIdx) {
+            if (IsLeaf()) {
+                leafIdx.push_back(&this->_idx);
+            } else {
+
+                this->_left->LeafIdx(leafIdx);
+                this->_right->LeafIdx(leafIdx);
             }
         }
 
@@ -120,9 +130,17 @@ namespace ss {
 
         void Train(const Matrix<DataType> & data) override {
             this->_root.MakeTree(data, ss::Range<int>(0, data.getSize()));
+
         }
 
         void Add(const Matrix<DataType> &data) override {
+        }
+
+        vector<vector<int > * > LeafIdx() {
+            vector<vector<int > * > leafIdx;
+            leafIdx.reserve(1 << this->_para.num_bit);
+            this->_root.LeafIdx(leafIdx);
+            return leafIdx;
         }
 
         void Search(const DataType* query, const std::function<void (int)>& prober) override {

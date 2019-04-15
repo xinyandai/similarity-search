@@ -52,6 +52,14 @@ namespace ss {
         explicit Matrix(const std::string &path): _data(NULL) {
             loadFvecs(this, path);
         }
+
+        explicit Matrix(const vector<vector<T > > &data) : _data(NULL) {
+            this->reset(data[0].size(), data.size());
+            for (int i = 0; i < data.size(); ++i) {
+                std::copy(std::begin(data[i]), std::end(data[i]), (*this)[i]);
+            }
+        }
+
         Matrix(const Matrix& M) = delete;
         Matrix& operator=(const Matrix& M)  = delete;
 
