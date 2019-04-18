@@ -67,7 +67,7 @@ namespace ss {
         }
 
         void Train(const Matrix<DataType > & data) override {
-            iterate(Visitor<DataType >(data, 0, data.getDim()));
+            Iterate(Visitor<DataType >(data, 0, data.getDim()));
         }
 
 
@@ -82,14 +82,18 @@ namespace ss {
             }
         }
 
+        const vector<int>& Search(const DataType *query)  {
+            return  _points[NearestCenter(query, _centers[0].size())];
+        }
+
         /***
          * iteratively update centers and re-assign points
          * @param data
          */
-        void iterate(const Visitor<DataType> & data) {
+        void Iterate(const Visitor<DataType> & data) {
 
             /// initialize centers
-            /// TODO(Xinyan): should be randomly initialize
+            /// TODO(Xinyan): should initialized randomly
             for(int i=0; i<_centers.size(); i++) {
                 _centers[i] = vector<DataType >(data[i], data[i]+data.getDim());
             }
@@ -132,9 +136,13 @@ namespace ss {
          * assign each point in {@link data} to nearest center
          */
         void Assign(const Visitor<DataType> & data) {
+            vector<int > codes(data.getSize());
+#pragma omp parallel for
+            for (int i = 0; i < data.getSize(); ++i) {
+                codes[i] = NearestCenter(data[i], data.getDim());
+            }
             for (int i=0; i<data.getSize(); ++i) {
-
-                _points[NearestCenter(data[i], data.getDim())].push_back(i);
+                _points[codes[i]].push_back(i);
             }
         }
 

@@ -74,7 +74,7 @@ namespace ss {
             for (int i=0; i<_K_means.size(); ++i) {
                 /// train each code-book,
                 /// use Visitor to represent data in each code-book
-                _K_means[i].iterate(Visitor<DataType >(data, _offsets[i], _dimensions[i]));
+                _K_means[i].Iterate(Visitor<DataType >(data, _offsets[i], _dimensions[i]));
             }
         }
 

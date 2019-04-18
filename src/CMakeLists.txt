@@ -39,6 +39,7 @@ SET(EXAMPLES
         rpt
         forest
         joint_inverted
+        multi_pq
 )
 
 FOREACH(EXAMPLE ${EXAMPLES} )
