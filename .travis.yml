@@ -25,4 +25,4 @@ script:
   - mkdir src/release
   - cd src/release
   - cmake ..
-  - make all -j
+  - make all
