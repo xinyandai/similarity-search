@@ -10,6 +10,29 @@ similarity-search
     cd build
     cmake ..
     make all -j
+
+### Run Simple-LSH
+
+    ./simple_lsh \
+        -t ../../data/netflix/netflix_base.fvecs  \
+        -b ../../data/netflix/netflix_base.fvecs  \
+        -q ../../data/netflix/netflix_query.fvecs \
+        -g ../../data/netflix/20_netflix_product_groundtruth.lshbox \
+        --transformed_dim 1 \
+        --num_bit 32
+
+### Run [Norm-Ranging LSH](https://arxiv.org/pdf/1809.08782.pdf)(Rational-Simple-LSH)
+
+    ./rational_nr \
+        -t ../../data/netflix/netflix_base.fvecs  \
+        -b ../../data/netflix/netflix_base.fvecs  \
+        -q ../../data/netflix/netflix_query.fvecs \
+        -g ../../data/netflix/20_netflix_product_groundtruth.lshbox \
+        --transformed_dim 1 \
+        --num_bit 27\
+        --num_sub_data_set 32
+
+
 ### Run L2-ALSH
 
     ./alsh \
@@ -38,6 +61,7 @@ similarity-search
         -g ../../data/netflix/20_netflix_product_groundtruth.lshbox \
         --transformed_dim 2 \
         --num_bit 32
+        
 ### Run Rational-Sign-ALSH
 
     ./rational_sign \
@@ -49,27 +73,6 @@ similarity-search
         --num_bit 27 \
         --num_sub_data_set 32
                 
-### Run Simple-LSH
-
-    ./simple_lsh \
-        -t ../../data/netflix/netflix_base.fvecs  \
-        -b ../../data/netflix/netflix_base.fvecs  \
-        -q ../../data/netflix/netflix_query.fvecs \
-        -g ../../data/netflix/20_netflix_product_groundtruth.lshbox \
-        --transformed_dim 1 \
-        --num_bit 32
-
-### Run Rational-Simple-LSH(Rational-Norm-Range)
-
-    ./rational_nr \
-        -t ../../data/netflix/netflix_base.fvecs  \
-        -b ../../data/netflix/netflix_base.fvecs  \
-        -q ../../data/netflix/netflix_query.fvecs \
-        -g ../../data/netflix/20_netflix_product_groundtruth.lshbox \
-        --transformed_dim 1 \
-        --num_bit 27\
-        --num_sub_data_set 32
-
 ### Run Cross-Polytope-Simple-LSH
 
     ./cross_polytope_simple_lsh \
