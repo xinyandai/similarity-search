@@ -103,6 +103,43 @@ namespace ss {
             }
         }
 
+
+        std::vector<int> SearchByID(int left_id, int right_id) {
+            std::vector<int> indices;
+            const vector<int>& left_idx = _left_joint_index[l]->SearchByID(left_id);
+            const vector<int>& right_idx = _right_joint_index[i]->SearchByID(right_id);
+            indices.reserve(std::min(left_idx.size(), right_idx.size()));
+            std::set_intersection(
+                    left_idx.begin(),left_idx.end(),
+                    right_idx.begin(),right_idx.end(),
+                    std::back_inserter(indices));
+            return indices;
+        }
+
+
+        vector<vector<std::pair<DataType, int> > > DistToCenters(const DataType* query) {
+            vector<vector<std::pair<DataType, int>   > > dist_to_centers(2);
+            dist_to_centers[0] = DistanceToCenter(_left_joint_index, query);
+            dist_to_centers[1] = DistanceToCenter(_right_joint_index, query);
+            return dist_to_centers;
+        }
+
+        vector<std::pair<DataType, int> > DistanceToCenter(
+                vector<KMeansIndex<DataType > * >   _joint_index, const DataType* query) {
+
+            int Ks = this->_para.kmeans_centers;
+            int L = this->_para.forest_size;
+            std::vector<std::pair<DataType, int > > KxLdistances(L * Ks);
+            for (int l = 0; l < L; ++l) {
+                std::vector<std::pair<DataType, int > > dis = _joint_index[l]->ClusterDistance(query, this->_para.dim);
+                for (int i = 0; i < Ks; ++i) {
+                    KxLdistances[i + l * Ks].first = dis[i].first;
+                    KxLdistances[i + l * Ks].second = dis[i].second + Ks * l;
+                }
+            }
+            return KxLdistances;
+        }
+
     };
 
 } // namespace ss

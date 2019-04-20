@@ -165,8 +165,8 @@ namespace ss {
          * calculate distances from {@link vector} to each center
          * @return distances within a vector of pair<distance, center>
          */
-        std::vector<std::pair<float, int > > ClusterDistance(const DataType *vector, int dimension) {
-            std::vector<std::pair<float, int>> dist_centers(this->_centers.size());
+        std::vector<std::pair<DataType, int > > ClusterDistance(const DataType *vector, int dimension) {
+            std::vector<std::pair<DataType, int>> dist_centers(this->_centers.size());
             for (int center = 0; center < (this->_centers.size()); ++center) {
                 DataType distance = Distance(vector, dimension, center);
                 dist_centers[center] = std::make_pair(distance, center);

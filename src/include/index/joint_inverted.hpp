@@ -117,6 +117,13 @@ namespace ss {
             }
         }
 
+        const vector<int > &points SearchByID(int id) {
+            int Ks = this->_para.kmeans_centers;
+            int l = KxLdistances[i].second / Ks;
+            int k = KxLdistances[i].second % Ks;
+            return this->_joint_index[l]->get_points()[k];
+        }
+
         void SearchByRanking(const DataType *query, const std::function<void (int)>& prober) {
             int Ks = this->_para.kmeans_centers;
             int L = this->_para.forest_size;
@@ -130,9 +137,7 @@ namespace ss {
             }
             ss::SortPairByFirst(&KxLdistances);
             for (int i = 0; i < L; i++) {
-                int l = KxLdistances[i].second / Ks;
-                int k = KxLdistances[i].second % Ks;
-                const vector<int > &points = this->_joint_index[l]->get_points()[k];
+                const vector<int > &points = this->SearchByID(KxLdistances[i].second)
                 for (int id : points) {
                     prober(id);
                 }
