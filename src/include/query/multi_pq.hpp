@@ -41,7 +41,8 @@ namespace ss {
     template <class DataType>
     class MultiPQRanker : public Query<DataType > {
     protected:
-        IMISequence *                              _imi_sequence;
+        IMISequence                                *_imi_sequence;
+        MultiPQIndex<DataType >                    *_multi_pq;
         vector<vector<std::pair<DataType, int> > > _dist_to_centers;
     public:
         ~MultiPQRanker() {
@@ -56,8 +57,13 @@ namespace ss {
                 const parameter                   &para)
                 :
                 Query<DataType >(index, query, metric, data, para),
+                _multi_pq(index),
                 _dist_to_centers(index->DistToCenters(query)) {
 
+            /// sorting all centers by ascending order, in each code-book
+            for (int i = 0; i < _dist_to_centers.size(); ++i) {
+                ss::SortPairByFirst(&_dist_to_centers[i]);
+            }
             /// distance function from query to bucket(designated by coord)
             auto distor = [this, &para](vector<int > coord) {
                 DataType distance = 0.0f;
@@ -66,14 +72,16 @@ namespace ss {
                 }
                 return distance;
             };
-            _imi_sequence = new IMISequence(vector<size_t >(2, para.kmeans_centers ), distor);
+            _imi_sequence = new IMISequence(vector<size_t >(2, para.kmeans_centers * para.forest_size), distor);
 
         }
 
         const vector<int > & NextBucket() override {
             static std::vector<int> temp;
             vector<int > coord = _imi_sequence->Next().second;
-            temp = std::dynamic_cast < MultiPQIndex > (this->_index ).SearchByID(coord[0], coord[1]);
+            temp = _multi_pq->SearchByID(
+                    _dist_to_centers[0][coord[0]].second,
+                    _dist_to_centers[1][coord[1]].second);
             return temp;
         }
 

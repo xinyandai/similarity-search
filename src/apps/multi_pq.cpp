@@ -24,21 +24,20 @@
 /// @contact xinyan.dai@outlook.com
 //////////////////////////////////////////////////////////////////////////////
 
-#include "search.hpp"
+#include "executor.hpp"
 
 #include "index/multi_pq.hpp"
-#include "query/forest_query.hpp"
+#include "query/multi_pq.hpp"
 
 int main(int argc, char** argv) {
 
     parameter para;
     LoadOptions(argc, argv, para);
     using DataType   = float;
-    using QueryType  = ss::ForestQuery<DataType >;
+    using QueryType  = ss::MultiPQRanker<DataType >;
     using ForestType = ss::MultiPQIndex<DataType >;
-    using MetricType = ss::EuclidMetric<DataType>;
-
-    Search<DataType, ForestType, QueryType, MetricType >(para);
+    using MetricType = ss::EuclidMetric<DataType >;
+    SearchIterative<DataType, ForestType, QueryType, MetricType >(para);
     return 0;
 }
 

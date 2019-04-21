@@ -117,11 +117,9 @@ namespace ss {
             }
         }
 
-        const vector<int > &points SearchByID(int id) {
+        const vector<int > & SearchByID(int id) {
             int Ks = this->_para.kmeans_centers;
-            int l = KxLdistances[i].second / Ks;
-            int k = KxLdistances[i].second % Ks;
-            return this->_joint_index[l]->get_points()[k];
+            return this->_joint_index[id / Ks]->get_points()[id % Ks];
         }
 
         void SearchByRanking(const DataType *query, const std::function<void (int)>& prober) {
@@ -136,8 +134,8 @@ namespace ss {
                 }
             }
             ss::SortPairByFirst(&KxLdistances);
-            for (int i = 0; i < L; i++) {
-                const vector<int > &points = this->SearchByID(KxLdistances[i].second)
+            for (int i = 0; i < L; i++) { // probe L buckets
+                const vector<int > &points = this->SearchByID(KxLdistances[i].second);
                 for (int id : points) {
                     prober(id);
                 }
