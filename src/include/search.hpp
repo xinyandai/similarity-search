@@ -87,13 +87,6 @@ int Search(parameter &para) {
     index.Add(base_data);
     cout << "using time :" << time_recorder.elapsed() << endl;
 
-
-    vector<QueryType * >                  queries(para.query_size);
-    for (int i = 0; i < para.query_size; i++) {
-        /// determine the sequence of probing bucket(except probing by looking up)
-        queries[i] = (new QueryType(&index, query_data[i], metric, base_data, para) );
-    }
-
     const char * spliter = ", ";
     cout << "#==============================================================================" << endl;
     cout << "#==============================================================================" << endl;
@@ -106,6 +99,12 @@ int Search(parameter &para) {
          << "\n";
 
     time_recorder.restart();
+
+    vector<QueryType * >                  queries(para.query_size);
+    for (int i = 0; i < para.query_size; i++) {
+        /// determine the sequence of probing bucket(except probing by looking up)
+        queries[i] = (new QueryType(&index, query_data[i], metric, base_data, para) );
+    }
 
     {
         vector<vector<pair<float, int > > >   current_topK(para.query_size);    //TODO copy should be avoided

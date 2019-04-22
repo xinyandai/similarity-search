@@ -8,8 +8,8 @@ similarity-search
     cd similarity-search/src
     mkdir build
     cd build
-    cmake ..
-    make all -j
+    cmake  -DCMAKE_BUILD_TYPE=Release  .. -DMY_BOOST="/research/jcheng2/xinyan/env/boost_install/lib/" -DMY_EIGEN="/usr/include/eigen3"
+    # make all -j
 
 ### Run Simple-LSH
 
