@@ -55,7 +55,9 @@ SET(EXAMPLES
         rpt
         forest
         joint_inverted
-        multi_pq)
+        multi_pq_ranker
+        multi_pq_counter
+        )
 
 FOREACH(EXAMPLE ${EXAMPLES} )
     ADD_EXECUTABLE(${EXAMPLE} apps/${EXAMPLE}.cpp)

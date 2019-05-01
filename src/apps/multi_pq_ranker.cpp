@@ -27,7 +27,7 @@
 #include "executor.hpp"
 
 #include "index/multi_pq.hpp"
-#include "query/multi_pq.hpp"
+#include "query/multi_pq_ranker.hpp"
 
 int main(int argc, char** argv) {
 

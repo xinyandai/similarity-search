@@ -43,6 +43,7 @@ namespace ss {
     protected:
         IMISequence                                *_imi_sequence;
         MultiPQIndex<DataType >                    *_multi_pq;
+        vector<bool >                              _visited;
         vector<vector<std::pair<DataType, int> > > _dist_to_centers;
     public:
         ~MultiPQRanker() {
@@ -58,7 +59,8 @@ namespace ss {
                 :
                 Query<DataType >(index, query, metric, data, para),
                 _multi_pq(index),
-                _dist_to_centers(index->DistToCenters(query)) {
+                _dist_to_centers(index->DistToCenters(query)),
+                _visited(data.getSize(), 0){
 
             /// sorting all centers by ascending order, in each code-book
             for (int i = 0; i < _dist_to_centers.size(); ++i) {
@@ -76,13 +78,28 @@ namespace ss {
 
         }
 
+        void ProbeItems(const int num_items) override {
+
+            while(this->GetNumItemsProbed() < num_items && NextBucketExisted()) {
+
+                vector<int > coord = _imi_sequence->Next().second;
+                std::vector<int> bucket = _multi_pq->SearchByID(
+                        _dist_to_centers[0][coord[0]].second,
+                        _dist_to_centers[1][coord[1]].second);
+                for(int id : bucket)
+                    RepeatProbe(id);
+            }
+        }
+
+        void RepeatProbe(int id) {
+            if (! _visited[id]) {
+                _visited[id] = true;
+                this->probe(id);
+            }
+        }
+
         const vector<int > & NextBucket() override {
-            static std::vector<int> temp;
-            vector<int > coord = _imi_sequence->Next().second;
-            temp = _multi_pq->SearchByID(
-                    _dist_to_centers[0][coord[0]].second,
-                    _dist_to_centers[1][coord[1]].second);
-            return temp;
+            throw std::invalid_argument("Should not invoke this function!");
         }
 
         bool NextBucketExisted() const override   {
@@ -90,5 +107,4 @@ namespace ss {
         }
 
     };
-
 } // namespace ss

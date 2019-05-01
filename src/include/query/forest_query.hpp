@@ -41,6 +41,8 @@ namespace ss {
 
     template <class DataType>
     class ForestQuery : public Query<DataType > {
+    protected:
+        vector<bool >                                    _visited;
     public:
         ~ForestQuery() { }
 
@@ -50,10 +52,18 @@ namespace ss {
                 const Metric<DataType >          &metric,
                 const Matrix<DataType >          &data,
                 const parameter                  &para):
-                Query<DataType >(index, query, metric, data, para) {}
+                Query<DataType >(index, query, metric, data, para),
+                _visited(data.getSize(), false) {}
 
         void ProbeItems(const int num_items) {
-            this->_index->Search(this->_query, [&](int id) {this->probe(id); });
+            this->_index->Search(this->_query, [&](int id) {this->RepeatProbe(id); });
+        }
+
+        void RepeatProbe(int id) {
+            if (! _visited[id]) {
+                _visited[id] = true;
+                this->probe(id);
+            }
         }
 
         const vector<int> & NextBucket() override {}

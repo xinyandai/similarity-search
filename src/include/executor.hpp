@@ -132,15 +132,16 @@ int SearchIterative(parameter &para) {
          << "avg items"
          << "\n";
 
-    time_recorder.restart();
 
-    vector<QueryType * >                  queries(para.query_size);
-    for (int i = 0; i < para.query_size; i++) {
-        /// determine the sequence of probing bucket(except probing by looking up)
-        queries[i] = (new QueryType(&index, query_data[i], metric, base_data, para) );
-    }
 
     for (int num_items = 1; num_items / 2 < para.base_size; num_items *= 2 ) {
+        time_recorder.restart();
+
+        vector<QueryType * >                  queries(para.query_size);
+        for (int i = 0; i < para.query_size; i++) {
+            /// determine the sequence of probing bucket(except probing by looking up)
+            queries[i] = (new QueryType(&index, query_data[i], metric, base_data, para) );
+        }
 
         if ( num_items > para.base_size )
             num_items = para.base_size;
@@ -172,10 +173,9 @@ int SearchIterative(parameter &para) {
                  << truth_bench.avg_items(item_probed)                       << "\n";
         }
 
-    }
-
-    for (int i = 0; i < para.query_size; i++) {
-        delete  queries[i];
+        for (int i = 0; i < para.query_size; i++) {
+            delete  queries[i];
+        }
     }
 
     return 0;
