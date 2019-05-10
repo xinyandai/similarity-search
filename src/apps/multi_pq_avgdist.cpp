@@ -35,7 +35,7 @@ int main(int argc, char **argv)
     parameter para;
     LoadOptions(argc, argv, para);
     using DataType = float;
-    using QueryType = ss::MultiPQRanker<DataType>;
+    using QueryType = ss::MultiPQAvgdist<DataType>;
     using ForestType = ss::MultiPQIndex<DataType>;
     using MetricType = ss::EuclidMetric<DataType>;
     SearchIterative<DataType, ForestType, QueryType, MetricType>(para);

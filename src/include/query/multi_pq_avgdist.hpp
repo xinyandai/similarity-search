@@ -29,6 +29,7 @@
 #include <vector>
 #include <unordered_map>
 #include <algorithm>
+#include <numeric>
 
 #include "sorter/imi_sorter.hpp"
 
@@ -39,9 +40,8 @@
 
 namespace ss
 {
-
 template <class DataType>
-class MultiPQCounter : public Query<DataType>
+class MultiPQAvgdist : public Query<DataType>
 {
 protected:
     IMISequence *_imi_sequence;
@@ -51,13 +51,13 @@ protected:
     vector<float> _avgdist;
 
 public:
-    ~MultiPQCounter()
+    ~MultiPQAvgdist()
     {
         if (_imi_sequence)
             delete _imi_sequence;
     }
 
-    explicit MultiPQCounter(
+    explicit MultiPQAvgdist(
         MultiPQIndex<DataType> *index,
         const DataType *query,
         const Metric<DataType> &metric,
@@ -67,7 +67,7 @@ public:
           _multi_pq(index),
           _dist_to_centers(index->DistToCenters(query)),
           _visited(data.getSize(), 0),
-          _avgdist(data.getSize(), 0)
+          _avgdist(data.getSize(), 0.0)
     {
 
         /// sorting all centers by ascending order, in each code-book
@@ -94,8 +94,9 @@ public:
         while (this->GetNumItemsProbed() < num_items && NextBucketExisted())
         {
 
-            vector<int> coord = _imi_sequence->Next().second;
-            float temp_dist = _imi_sequence->Next().first;
+            pair<float, vector<int>> next_item = _imi_sequence->Next();
+            vector<int> coord = next_item.second;
+            float temp_dist = next_item.first;
             std::vector<int> bucket = _multi_pq->SearchByID(
                 _dist_to_centers[0][coord[0]].second,
                 _dist_to_centers[1][coord[1]].second);
@@ -117,20 +118,17 @@ public:
     vector<pair<float, int>> GetSortedTopK() const override
     {
 
-        vector<pair<float, int>> sorted;
-        sorted.reserve(this->_para.topK);
-        vector<unsigned int> idx(_visited.size());
-
-        // argsort()
-        iota(idx.begin(), idx.end(), 0);
-        sort(idx.begin(),idx.end(),[&_avgdist](unsigned int i1, unsigned in i2){
-            return _avgdist[i1] < _avgdist[i2]};
-
-        for (int i = 0; i < sorted.size(); i++)
+        vector<pair<float, int>> unsorted;
+        unsorted.reserve(_visited.size());
+        for (int i = 0; i < _visited.size(); i++)
         {
-            sorted.push_back(std::make_pair(_avgdist[idx[i]]), idx[i]);
+            if (_avgdist[i] > 0.000001)
+                unsorted.push_back(std::make_pair(_avgdist[i], i));
         }
 
+        std::sort(unsorted.begin(), unsorted.end(), [](const pair<float, int> &i, const pair<float, int> &j) { return i.first < j.first; });
+
+        vector<pair<float, int>> sorted(unsorted.begin(), unsorted.begin() + this._para.topK);
         return sorted;
     }
 

@@ -56,6 +56,7 @@ SET(EXAMPLES
         forest
         joint_inverted
         multi_pq_ranker
+        multi_pq_avgdist
         multi_pq_counter
         )
 
