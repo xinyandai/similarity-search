@@ -150,7 +150,8 @@ int SearchIterative(parameter &para) {
         vector<int >                          item_probed(para.query_size);
 
         {  /// probing
-#pragma omp parallel for
+            //uncomment to test in parallel mode:
+            // #pragma omp parallel for
             for (int i = 0; i <  para.query_size; i++) {  /// probing
                 /// probe more bucket util the number of probed item is no less than {$numItems}
                 queries[i]->ProbeItems(num_items);
