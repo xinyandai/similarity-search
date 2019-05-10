@@ -32,156 +32,175 @@
 #include <vector>
 #include <utility>
 
-namespace ss {
+namespace ss
+{
 
-    using std::vector;
-    using std::pair;
+using std::pair;
+using std::vector;
 
-    template <typename T>
-    vector<T > Range(T start, T end) {
-        vector<T > result(end - start);
-        for (T j = start; j < end; ++j) {
-            result[j - start] = j;
-        }
-        return result;
+template <typename T>
+vector<T> Range(T start, T end)
+{
+    vector<T> result(end - start);
+    for (T j = start; j < end; ++j)
+    {
+        result[j - start] = j;
     }
+    return result;
+}
 
-    template <typename T>
-    vector<T> FancyIndex(const vector<T> &v, const vector<size_t > idx) {
-        vector<T> sub_vec(idx.size());
-        for (int j = 0; j < idx.size(); ++j) {
-            sub_vec[j] = v[idx[j]];
-        }
-        return sub_vec;
+template <typename T>
+vector<T> FancyIndex(const vector<T> &v, const vector<size_t> idx)
+{
+    vector<T> sub_vec(idx.size());
+    for (int j = 0; j < idx.size(); ++j)
+    {
+        sub_vec[j] = v[idx[j]];
     }
+    return sub_vec;
+}
 
-    template <typename T>
-    vector<size_t> SortIndexes(const vector<T> &v) {
+template <typename T>
+vector<size_t> SortIndexes(const vector<T> &v)
+{
 
-        // initialize original index locations
-        vector<size_t> idx = ss::Range<size_t >(0, v.size());
-        // sort indexes based on comparing values in v
-        std::sort(
-                idx.begin(),
-                idx.end(),
-                [&v](size_t i1, size_t i2) {return v[i1] < v[i2];}
-                );
-        return idx;
+    // initialize original index locations
+    vector<size_t> idx = ss::Range<size_t>(0, v.size());
+    // sort indexes based on comparing values in v
+    std::sort(
+        idx.begin(),
+        idx.end(),
+        [&v](size_t i1, size_t i2) { return v[i1] < v[i2]; });
+    return idx;
+}
+
+template <typename FirstType, typename SencondType>
+void SortPairByFirst(vector<std::pair<FirstType, SencondType>> *_sorted_bucket)
+{
+    std::sort(
+        _sorted_bucket->begin(),
+        _sorted_bucket->end(),
+        [](const pair<FirstType, SencondType> &a, const pair<FirstType, SencondType> &b) {
+            if (a.first != b.first)
+                return a.first < b.first;
+            else
+                return a.second < b.second;
+        });
+}
+
+template <typename FirstType, typename SencondType>
+void SortPairBySecond(vector<std::pair<FirstType, SencondType>> *_sorted_bucket)
+{
+    std::sort(
+        _sorted_bucket->begin(),
+        _sorted_bucket->end(),
+        [](const pair<FirstType, SencondType> &a, const pair<FirstType, SencondType> &b) {
+            if (a.second != b.second)
+                return a.second < b.second;
+            else
+                return a.first < b.first;
+        });
+}
+
+template <class DataType>
+DataType inline InnerProduct(const DataType *a, const DataType *b, int dim)
+{
+
+    DataType sum = .0;
+    for (int i = 0; i < dim; ++i)
+    {
+        sum += a[i] * b[i];
     }
+    return sum;
+}
 
-    template <typename FirstType, typename SencondType>
-    void SortPairByFirst(vector<std::pair<FirstType, SencondType> > * _sorted_bucket) {
-        std::sort(
-                _sorted_bucket->begin(),
-                _sorted_bucket->end(),
-                [](const pair<FirstType, SencondType >& a, const pair<FirstType, SencondType>& b) {
-                    if (a.first != b.first)
-                        return a.first < b.first;
-                    else
-                        return a.second < b.second;
-                });
+template <class DataType>
+DataType inline CalculateNorm(const DataType *a, int dim)
+{
+    return std::sqrt(InnerProduct(a, a, dim));
+}
+
+template <class DataType>
+DataType inline Cosine(const DataType *a, const DataType *b, int dim)
+{
+    return InnerProduct(a, b, dim) / static_cast<double>(CalculateNorm(a, dim)) / CalculateNorm(b, dim);
+}
+
+template <class DataType>
+DataType inline DiffProduct(const DataType *a, const DataType *means, const DataType *b, int dim)
+{
+
+    DataType sum = .0;
+    for (int i = 0; i < dim; ++i)
+    {
+        sum += (a[i] - means[i]) * b[i];
     }
+    return sum;
+}
 
-    template <typename FirstType, typename SencondType>
-    void SortPairBySecond(vector<std::pair<FirstType, SencondType> > * _sorted_bucket) {
-        std::sort(
-                _sorted_bucket->begin(),
-                _sorted_bucket->end(),
-                [](const pair<FirstType, SencondType >& a, const pair<FirstType, SencondType>& b) {
-                    if (a.second != b.second)
-                        return a.second < b.second;
-                    else
-                        return a.first < b.first;
-                });
+template <class DataType>
+DataType inline EuclidDistance(const DataType *a, const DataType *b, int dim)
+{
+
+    DataType sum = .0;
+    for (int i = 0; i < dim; ++i)
+    {
+        sum += (a[i] - b[i]) * (a[i] - b[i]);
     }
+    return sqrt(sum);
+}
 
+template <class DataType>
+DataType inline AngularDistance(const DataType *a, const DataType *b, int dim)
+{
+    return std::acos(Cosine(a, b, dim));
+}
 
-    template <class DataType >
-    DataType inline InnerProduct(const DataType *a, const DataType *b, int dim) {
+template <class DataType>
+DataType inline InnerProductDistance(const DataType *a, const DataType *b, int dim)
+{
+    return -InnerProduct(a, b, dim);
+}
 
-        DataType sum = .0;
-        for (int i = 0; i < dim; ++i) {
-            sum += a[i] * b[i];
-        }
-        return sum;
+template <class DataType>
+void inline ScaleData(DataType *target, const DataType *data, DataType scale, int dim)
+{
+    for (int d = 0; d < dim; d++)
+    {
+        target[d] = data[d] / scale;
     }
+}
 
-    template <class DataType>
-    DataType inline CalculateNorm(const DataType *a, int dim) {
-        return std::sqrt(InnerProduct(a, a, dim));
+template <class DataType>
+void inline Normalize(DataType *data, int dim)
+{
+    ScaleData(data, data, CalculateNorm(data, dim), dim);
+}
+
+int inline CountBitOne(uint64_t xorval)
+{
+    int count = 0;
+
+    while (xorval != 0)
+    {
+        count++;
+        xorval &= (xorval - 1);
     }
+    return count;
+}
 
-
-    template <class DataType >
-    DataType inline Cosine(const DataType *a, const DataType *b, int dim) {
-        return InnerProduct(a, b, dim) / static_cast<double >(CalculateNorm(a, dim)) / CalculateNorm(b, dim);
-    }
-
-
-    template <class DataType>
-    DataType inline DiffProduct(const DataType *a, const DataType *means, const DataType *b, int dim) {
-    
-        DataType sum = .0;
-        for (int i = 0; i < dim; ++i) {
-            sum += (a[i] - means[i]) * b[i];
-        }
-        return sum;
-    }
-
-
-    template <class DataType >
-    DataType inline EuclidDistance(const DataType *a, const DataType *b, int dim) {
-
-        DataType sum = .0;
-        for (int i = 0; i < dim; ++i) {
-            sum += (a[i] - b[i]) * (a[i] - b[i]);
-        }
-        return sqrt(sum);
-    }
-
-    template <class DataType >
-    DataType inline AngularDistance(const DataType *a, const DataType *b, int dim) {
-        return std::acos(Cosine(a, b, dim));
-    }
-
-    template <class DataType >
-    DataType inline InnerProductDistance(const DataType *a, const DataType *b, int dim) {
-        return - InnerProduct(a, b, dim);
-    }
-
-
-    template <class DataType>
-    void inline ScaleData(DataType *target, const DataType *data, DataType scale, int dim) {
-        for (int d = 0; d<dim; d++) {
-            target[d] = data[d] / scale;
-        }
-    }
-
-
-    template <class DataType>
-    void inline Normalize(DataType *data, int dim) {
-        ScaleData(data, data, CalculateNorm(data, dim), dim);
-    }
-
-    int inline CountBitOne(uint64_t xorval) {
-        int count = 0;
-
-        while(xorval != 0) {
+template <class DataType>
+int inline CountDiff(const DataType *a, const DataType *b, int dim)
+{
+    int count = 0;
+    for (int d = 0; d < dim; d++)
+    {
+        if (a[d] != b[d])
+        {
             count++;
-            xorval &= (xorval-1);
         }
-        return count;
     }
-
-    template <class DataType >
-    int inline CountDiff(const DataType *a, const DataType *b, int dim) {
-        int count = 0;
-        for (int d=0; d<dim; d++) {
-            if (a[d]!=b[d]) {
-                count++;
-            }
-        }
-        return count;
-    }
+    return count;
+}
 
 } // namespace ss

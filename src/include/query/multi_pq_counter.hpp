@@ -36,97 +36,113 @@
 #include "../index/multi_pq.hpp"
 #include "../utils/calculator.hpp"
 
-namespace ss {
+namespace ss
+{
 
-    template <class DataType>
-    class MultiPQCounter : public Query<DataType > {
-    protected:
-        IMISequence                                *_imi_sequence;
-        MultiPQIndex<DataType >                    *_multi_pq;
-        vector<unsigned int >                      _visited;
-        vector<vector<std::pair<DataType, int> > > _dist_to_centers;
-    public:
-        ~MultiPQCounter() {
-            if (_imi_sequence) delete _imi_sequence;
+template <class DataType>
+class MultiPQCounter : public Query<DataType>
+{
+protected:
+    IMISequence *_imi_sequence;
+    MultiPQIndex<DataType> *_multi_pq;
+    vector<unsigned int> _visited;
+    vector<vector<std::pair<DataType, int>>> _dist_to_centers;
+
+public:
+    ~MultiPQCounter()
+    {
+        if (_imi_sequence)
+            delete _imi_sequence;
+    }
+
+    explicit MultiPQCounter(
+        MultiPQIndex<DataType> *index,
+        const DataType *query,
+        const Metric<DataType> &metric,
+        const Matrix<DataType> &data,
+        const parameter &para)
+        : Query<DataType>(index, query, metric, data, para),
+          _multi_pq(index),
+          _dist_to_centers(index->DistToCenters(query)),
+          _visited(data.getSize(), 0)
+    {
+
+        /// sorting all centers by ascending order, in each code-book
+        for (int i = 0; i < _dist_to_centers.size(); ++i)
+        {
+            ss::SortPairByFirst(&_dist_to_centers[i]);
         }
-
-        explicit MultiPQCounter(
-                MultiPQIndex<DataType >           *index,
-                const DataType                    *query,
-                const Metric<DataType >           &metric,
-                const Matrix<DataType >           &data,
-                const parameter                   &para)
-                :
-                Query<DataType >(index, query, metric, data, para),
-                _multi_pq(index),
-                _dist_to_centers(index->DistToCenters(query)),
-                _visited(data.getSize(), 0){
-
-            /// sorting all centers by ascending order, in each code-book
-            for (int i = 0; i < _dist_to_centers.size(); ++i) {
-                ss::SortPairByFirst(&_dist_to_centers[i]);
+        /// distance function from query to bucket(designated by coord)
+        auto distor = [this, &para](vector<int> coord) {
+            DataType distance = 0.0f;
+            for (int code_book = 0; code_book < 2; ++code_book)
+            {
+                distance += _dist_to_centers[code_book][coord[code_book]].first;
             }
-            /// distance function from query to bucket(designated by coord)
-            auto distor = [this, &para](vector<int > coord) {
-                DataType distance = 0.0f;
-                for (int code_book = 0; code_book < 2; ++code_book) {
-                    distance += _dist_to_centers[code_book][coord[code_book]].first;
-                }
-                return distance;
-            };
-            _imi_sequence = new IMISequence(vector<size_t >(2, para.kmeans_centers * para.forest_size), distor);
+            return distance;
+        };
+        _imi_sequence = new IMISequence(vector<size_t>(2, para.kmeans_centers * para.forest_size), distor);
+    }
 
+    void ProbeItems(const int num_items) override
+    {
+
+        while (this->GetNumItemsProbed() < num_items && NextBucketExisted())
+        {
+
+            vector<int> coord = _imi_sequence->Next().second;
+            std::vector<int> bucket = _multi_pq->SearchByID(
+                _dist_to_centers[0][coord[0]].second,
+                _dist_to_centers[1][coord[1]].second);
+            for (int id : bucket)
+                ProbeRank(id);
         }
+    }
 
-        void ProbeItems(const int num_items) override {
+    void ProbeRank(int id)
+    {
+        if (!_visited[id])
+        {
+            this->_count++;
+        }
+        _visited[id]++;
+    }
 
-            while(this->GetNumItemsProbed() < num_items && NextBucketExisted()) {
+    vector<pair<float, int>> GetSortedTopK() const override
+    {
+        vector<pair<float, int>> sorted;
+        sorted.reserve(this->_para.topK);
 
-                vector<int > coord = _imi_sequence->Next().second;
-                std::vector<int> bucket = _multi_pq->SearchByID(
-                        _dist_to_centers[0][coord[0]].second,
-                        _dist_to_centers[1][coord[1]].second);
-                for(int id : bucket)
-                    ProbeRank(id);
+        vector<vector<int>> dist(1 + this->_para.forest_size * this->_para.forest_size);
+        for (int i = 0; i < _visited.size(); ++i)
+        {
+            if (_visited[i] != 0)
+            {
+                dist[_visited[i]].push_back(i);
             }
         }
 
-        void ProbeRank(int id) {
-            if (! _visited[id]) {
-                this->_count++;
+        for (int i = dist.size() - 1; i > 0; --i)
+        {
+            vector<int> &ids = dist[i];
+            for (int id : ids)
+            {
+                sorted.push_back(std::make_pair(float(i), id));
+                if (sorted.size() > this->_para.topK)
+                    return sorted;
             }
-            _visited[id]++;
         }
+        return sorted;
+    }
 
-        vector<pair<float, int> >  GetSortedTopK() const override {
-            vector<pair<float, int> > sorted;
-            sorted.reserve(this->_para.topK);
+    const vector<int> &NextBucket() override
+    {
+        throw std::invalid_argument("Should not invoke this function!");
+    }
 
-            vector<vector<int > >  dist(1 + this->_para.forest_size * this->_para.forest_size);
-            for (int i = 0; i < _visited.size(); ++i) {
-                if (_visited[i]!=0) {
-                    dist[_visited[i]].push_back(i);
-                }
-            }
-
-            for (int i = dist.size()-1; i > 0 ; --i) {
-                vector<int > &ids = dist[i];
-                for (int id : ids) {
-                    sorted.push_back(std::make_pair(float(i), id));
-                    if(sorted.size() > this->_para.topK)
-                        return sorted;
-                }
-            }
-            return sorted;
-        }
-
-        const vector<int > & NextBucket() override {
-            throw std::invalid_argument("Should not invoke this function!");
-        }
-
-        bool NextBucketExisted() const override   {
-            return _imi_sequence->HasNext();
-        }
-
-    };
+    bool NextBucketExisted() const override
+    {
+        return _imi_sequence->HasNext();
+    }
+};
 } // namespace ss
