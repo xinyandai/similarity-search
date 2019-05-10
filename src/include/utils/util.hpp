@@ -21,10 +21,9 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include <time.h>
+#include <chrono>
 #include <string>
 #include <iostream>
-
 namespace ss {
 
     /**
@@ -32,24 +31,27 @@ namespace ss {
      */
     class timer {
     public:
-        timer(): time(static_cast<double>(clock())) {}
+        timer() {
+            restart();
+        }
         ~timer() {}
 
         /**
          * Restart the timer.
          */
         void restart() {
-            time = static_cast<double>(clock());
+            time_begin = std::chrono::steady_clock::now();
         }
         /**
          * Measures elapsed time.
          * @return The elapsed time
          */
-        double elapsed() {
-            return (static_cast<double>(clock()) - time) / CLOCKS_PER_SEC;
+        long elapsed() {
+            std::chrono::steady_clock::time_point time_end = std::chrono::steady_clock::now();
+            return (std::chrono::duration_cast<std::chrono::microseconds>(time_end - time_begin).count());
         }
     private:
-        double time;
+        std::chrono::steady_clock::time_point time_begin;
     };
 
 }  // namespace ss

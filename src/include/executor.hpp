@@ -150,7 +150,7 @@ int SearchIterative(parameter &para) {
         vector<int >                          item_probed(para.query_size);
 
         {  /// probing
-
+#pragma omp parallel for
             for (int i = 0; i <  para.query_size; i++) {  /// probing
                 /// probe more bucket util the number of probed item is no less than {$numItems}
                 queries[i]->ProbeItems(num_items);
@@ -161,7 +161,7 @@ int SearchIterative(parameter &para) {
         }
 
         /// statistic such as recall, precision, probing time and probed items
-        double timer_elapsed = time_recorder.elapsed();
+        double timer_elapsed = time_recorder.elapsed() / (para.query_size + 0.0);
 
         {
             Bencher current_bench(current_topK, true);
